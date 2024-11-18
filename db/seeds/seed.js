@@ -1,12 +1,13 @@
 const format = require("pg-format");
 const db = require("../connection.js");
-const {
+
+const seed = ({
+  userData,
   historiesData,
   tasksData,
   routinesData,
-} = require("../data/test-data/index.js");
-
-const seed = ({ userData, historiesData, tasksData, routinesData }) => {
+  levelsData,
+}) => {
   return db
     .query(`DROP TABLE IF EXISTS histories;`)
     .then(() => {
@@ -53,21 +54,42 @@ const seed = ({ userData, historiesData, tasksData, routinesData }) => {
       return db.query(`
             CREATE TABLE routines (
             routineId SERIAL PRIMARY KEY NOT NULL,
-            task_1 REFERENCES tasks(taskId) NOT NULL,
-            task_2 REFERENCES tasks(taskId) NOT NULL,
-            task_3 REFERENCES tasks(taskId),
-            task_4 REFERENCES tasks(taskId),
-            task_5 REFERENCES tasks(taskId),
-            task_6 REFERENCES tasks(taskId),
-            task_7 REFERENCES tasks(taskId),
-            task_8 REFERENCES tasks(taskId),
-            task_9 REFERENCES tasks(taskId),
-            task_10 REFERENCES tasks(taskId),
-            task_11 REFERENCES tasks(taskId),
-            task_12 REFERENCES tasks(taskId),
-            task_13 REFERENCES tasks(taskId),
-            task_14 REFERENCES tasks(taskId),
-            task_15 REFERENCES tasks(taskId),
+            task_1 INT REFERENCES tasks(taskId) NOT NULL,
+            task_2 INT REFERENCES tasks(taskId) NOT NULL,
+            task_3 INT REFERENCES tasks(taskId),
+            task_4 INT REFERENCES tasks(taskId),
+            task_5 INT REFERENCES tasks(taskId),
+            task_6 INT REFERENCES tasks(taskId),
+            task_7 INT REFERENCES tasks(taskId),
+            task_8 INT REFERENCES tasks(taskId),
+            task_9 INT REFERENCES tasks(taskId),
+            task_10 INT REFERENCES tasks(taskId),
+            task_11 INT REFERENCES tasks(taskId),
+            task_12 INT REFERENCES tasks(taskId),
+            task_13 INT REFERENCES tasks(taskId),
+            task_14 INT REFERENCES tasks(taskId),
+            task_15 INT REFERENCES tasks(taskId),
+            targetTime INT NOT NULL
         )`);
+    })
+    .then(() => {
+      return db.query(`
+            CREATE TABLE histories (
+            userId INT REFERENCES users(userId),
+            routineId INT REFERENCES routines(routineId),
+            timestamp TIMESTAMP DEFAULT NOW(),
+            totalTime INT NOT NULL
+        )`);
+    })
+    .then(() => {
+      const insertedLevelsQueryStr = format(
+        "INSERT INTO levels (name, gems_lower, gems_upper) VALUES %L",
+        levelsData.map(({ name, gems_lower, gems_upper }) => [
+          name,
+          gems_lower,
+          gems_upper,
+        ])
+      );
+      return db.query(insertedLevelsQueryStr);
     });
 };
