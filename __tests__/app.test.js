@@ -104,7 +104,7 @@ describe("Testing the API", () => {
     });
   });
   describe("Testing the tasks endpoint", () => {
-    test("Should return an array of tasks", () => {
+    test("GET: /tasks - Should return an array of tasks", () => {
       return request(app)
         .get("/api/tasks")
         .expect(200)
@@ -117,27 +117,34 @@ describe("Testing the API", () => {
           });
         });
     });
-    test("Should return an array of tasks by the user id", () => {
+    test("GET: /tasks/:user_id - Should return an array of tasks by the user id plus default tasks", () => {
       return request(app)
         .get("/api/tasks/1")
         .expect(200)
         .then(({ body: { tasks } }) => {
-          expect(tasks).toHaveLength(5);
+          expect(tasks).toHaveLength(8);
           tasks.forEach((task) => {
             expect([expect.any(Number), null]).toContainEqual(task.user_id);
             expect(task).toHaveProperty("task_name", expect.any(String));
             expect(task).toHaveProperty("gem_value", expect.any(Number));
+            expect(task).toHaveProperty("is_default")
           });
         });
     });
-    test("Should return an array of default", () => {
+    test("GET: /tasks/:user_id - returns array of only default tasks when user_id is null (ie: no user signed in)", () => {
       return request(app)
-        .get("/api/tasks/is_default")
+        .get("/api/tasks/0")
         .expect(200)
         .then(({ body: { tasks } }) => {
-          console.log(tasks);
+          expect(tasks).toHaveLength(3)
+          tasks.forEach((task) => {
+            expect(task).toHaveProperty("user_id", null);
+            expect(task).toHaveProperty("task_name", expect.any(String));
+            expect(task).toHaveProperty("gem_value", expect.any(Number));
+            expect(task).toHaveProperty("is_default", true)
+          })
         });
-    });
+    })
   });
 });
 

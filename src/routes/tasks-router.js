@@ -7,6 +7,6 @@ const {
 
 tasksRouter.get("/", getTasks);
 tasksRouter.get("/:user_id", getTasksByUserId);
-tasksRouter.get("/is_default", getDefaultTasks);
+
 
 module.exports = tasksRouter;

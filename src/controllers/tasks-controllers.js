@@ -24,14 +24,3 @@ exports.getTasksByUserId = (req, res, next) => {
       next(err);
     });
 };
-
-exports.getDefaultTasks = (req, res, next) => {
-  selectDefaultTasks()
-    .then((tasks) => {
-      res.status(200).send({ tasks });
-    })
-    .catch((err) => {
-      console.log(err);
-      next(err);
-    });
-};
