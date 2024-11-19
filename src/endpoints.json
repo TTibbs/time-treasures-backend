@@ -1,0 +1,52 @@
+{
+  "GET /api": {
+    "description": "serves up a json representation of all the available endpoints of the api"
+  },
+  "GET /api/users": {
+    "description": "Returns an array of users with the username, name and avatar url",
+    "exampleResponse": [
+      {
+        "username": "user1",
+        "email": "user1@example.com",
+        "level": 4,
+        "totalGems": 120,
+        "image_url": "https://avatar.iran.liara.run/public/boy?username=Ash"
+      },
+      {
+        "username": "user2",
+        "email": "user2@example.com",
+        "level": 7,
+        "totalGems": 350,
+        "image_url": "https://avatar.iran.liara.run/public/boy?username=Ash"
+      },
+      {
+        "username": "user3",
+        "email": "user3@example.com",
+        "level": 3,
+        "totalGems": 90
+      },
+      {
+        "username": "user4",
+        "email": "user4@example.com",
+        "level": 8,
+        "totalGems": 420
+      },
+      {
+        "username": "user5",
+        "email": "user5@example.com",
+        "level": 5,
+        "totalGems": 220,
+        "image_url": "https://avatar.iran.liara.run/public/boy?username=Ash"
+      }
+    ]
+  },
+  "GET /api/users/:user_id": {
+    "description": "returns a username based on the parameter used",
+    "example_input": "/api/users/rogersop",
+    "exampleResponse": {
+      "username": "icellusedkars",
+      "name": "sam",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4"
+    }
+  }
+}

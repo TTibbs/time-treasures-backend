@@ -1,6 +1,6 @@
 const format = require("pg-format");
 const db = require("../connection.js");
-const { formatRoutineTasks } = require("./utils.js")
+const { formatRoutineTasks } = require("./utils.js");
 
 const seed = ({
   userData,
@@ -21,25 +21,14 @@ const seed = ({
       return db.query(`DROP TABLE IF EXISTS users`);
     })
     .then(() => {
-      return db.query(`DROP TABLE IF EXISTS levels`);
-    })
-    .then(() => {
-      return db.query(`
-            CREATE TABLE levels (
-            level_id SERIAL PRIMARY KEY,
-            name VARCHAR NOT NULL,
-            gems_lower INT NOT NULL,
-            gems_upper INT
-        )`);
-    })
-    .then(() => {
       return db.query(`
             CREATE TABLE users (
             user_id SERIAL PRIMARY KEY,
             username VARCHAR NOT NULL,
             email VARCHAR NOT NULL,
-            level INT NOT NULL DEFAULT 1 REFERENCES levels(level_id),
-            total_gems INT NOT NULL DEFAULT 0
+            level INT NOT NULL DEFAULT 1,
+            total_gems INT NOT NULL DEFAULT 0,
+            image_url VARCHAR
         )`);
     })
     .then(() => {
@@ -85,24 +74,14 @@ const seed = ({
         )`);
     })
     .then(() => {
-      const insertedLevelsQueryStr = format(
-        "INSERT INTO levels (name, gems_lower, gems_upper) VALUES %L",
-        levelsData.map(({ name, gems_lower, gems_upper }) => [
-          name,
-          gems_lower,
-          gems_upper,
-        ])
-      );
-      return db.query(insertedLevelsQueryStr);
-    })
-    .then(() => {
       const insertedUsersQueryStr = format(
-        `INSERT INTO users (username, email, level, total_gems) VALUES %L`,
-        userData.map(({ username, email, level, totalGems }) => [
+        `INSERT INTO users (username, email, level, total_gems, image_url) VALUES %L`,
+        userData.map(({ username, email, level, total_gems, image_url }) => [
           username,
           email,
           level,
-          totalGems,
+          total_gems,
+          image_url,
         ])
       );
       return db.query(insertedUsersQueryStr);
@@ -120,9 +99,8 @@ const seed = ({
     })
     .then(() => {
       const formattedData = routinesData.map((routine) => {
-        return formatRoutineTasks(routine)
-      })
-      console.log(formattedData)
+        return formatRoutineTasks(routine);
+      });
       const insertedRoutinesQueryStr = format(
         `INSERT INTO routines (user_id, 
         task_1, 
@@ -143,20 +121,20 @@ const seed = ({
         target_time) VALUES %L`,
         formattedData
       );
-      return db.query(insertedRoutinesQueryStr)
+      return db.query(insertedRoutinesQueryStr);
     })
     .then(() => {
       const insertedHistoriesQueryStr = format(
         `INSERT INTO histories (user_id, routine_id, timestamp, total_time) VALUES %L`,
-        historiesData.map(({userId, routineId, timestamp, time}) => [
+        historiesData.map(({ userId, routineId, timestamp, time }) => [
           userId,
           routineId,
           timestamp,
-          time
+          time,
         ])
-      )
-      return db.query(insertedHistoriesQueryStr)
-    })
+      );
+      return db.query(insertedHistoriesQueryStr);
+    });
 };
 
 module.exports = seed;
