@@ -19,3 +19,13 @@ exports.selectTaskByUserId = (user_id) => {
       return rows;
     });
 };
+
+exports.selectDefaultTasks = () => {
+  const isTrue = true;
+  return db
+    .query(`SELECT * FROM tasks WHERE tasks.is_default = $1`, [isTrue])
+    .then(({ rows }) => {
+      console.log(rows);
+      return rows;
+    });
+};

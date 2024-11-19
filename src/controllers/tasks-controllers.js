@@ -1,4 +1,8 @@
-const { selectTasks, selectTaskByUserId } = require("../models/tasks-models");
+const {
+  selectTasks,
+  selectTaskByUserId,
+  selectDefaultTasks,
+} = require("../models/tasks-models");
 
 exports.getTasks = (req, res, next) => {
   selectTasks()
@@ -17,6 +21,17 @@ exports.getTasksByUserId = (req, res, next) => {
       res.status(200).send({ tasks });
     })
     .catch((err) => {
+      next(err);
+    });
+};
+
+exports.getDefaultTasks = (req, res, next) => {
+  selectDefaultTasks()
+    .then((tasks) => {
+      res.status(200).send({ tasks });
+    })
+    .catch((err) => {
+      console.log(err);
       next(err);
     });
 };

@@ -122,13 +122,20 @@ describe("Testing the API", () => {
         .get("/api/tasks/1")
         .expect(200)
         .then(({ body: { tasks } }) => {
-          console.log(tasks);
           expect(tasks).toHaveLength(5);
           tasks.forEach((task) => {
             expect([expect.any(Number), null]).toContainEqual(task.user_id);
             expect(task).toHaveProperty("task_name", expect.any(String));
             expect(task).toHaveProperty("gem_value", expect.any(Number));
           });
+        });
+    });
+    test("Should return an array of default", () => {
+      return request(app)
+        .get("/api/tasks/is_default")
+        .expect(200)
+        .then(({ body: { tasks } }) => {
+          console.log(tasks);
         });
     });
   });
