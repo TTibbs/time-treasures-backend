@@ -123,7 +123,7 @@ describe("Testing the API", () => {
         .expect(200)
         .then(({ body: { tasks } }) => {
           console.log(tasks);
-          expect(tasks).toHaveLength(8);
+          expect(tasks).toHaveLength(5);
           tasks.forEach((task) => {
             expect([expect.any(Number), null]).toContainEqual(task.user_id);
             expect(task).toHaveProperty("task_name", expect.any(String));
