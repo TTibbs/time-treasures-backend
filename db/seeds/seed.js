@@ -1,5 +1,6 @@
 const format = require("pg-format");
 const db = require("../connection.js");
+const { formatRoutineTasks } = require("./utils.js")
 
 const seed = ({
   userData,
@@ -91,5 +92,68 @@ const seed = ({
         ])
       );
       return db.query(insertedLevelsQueryStr);
-    });
+    })
+    .then(() => {
+      const insertedUsersQueryStr = format(
+        `INSERT INTO users (username, email, level, totalGems) VALUES %L`,
+        userData.map(({ username, email, level, totalGems }) => [
+          username,
+          email,
+          level,
+          totalGems,
+        ])
+      );
+      return db.query(insertedUsersQueryStr);
+    })
+    .then(() => {
+      const insertedTasksQueryStr = format(
+        `INSERT INTO tasks (userId, taskName, gemValue) VALUES %L`,
+        tasksData.map(({ userId, taskName, gemValue }) => [
+          userId,
+          taskName,
+          gemValue,
+        ])
+      );
+      return db.query(insertedTasksQueryStr);
+    })
+    .then(() => {
+      const formattedData = routinesData.map((routine) => {
+        return formatRoutineTasks(routine)
+      })
+      const insertedRoutinesQueryStr = format(
+        `INSERT INTO routines (userID, 
+        tasks_1, 
+        tasks_2, 
+        tasks_3, 
+        tasks_4, 
+        tasks_5, 
+        tasks_6,
+        tasks_7, 
+        tasks_8, 
+        tasks_9, 
+        tasks_10, 
+        tasks_11, 
+        tasks_12,
+        tasks_13,
+        tasks_14,
+        tasks_15,
+        targetTime) VALUES %L`,
+        formattedData
+      );
+      return db.query(insertedRoutinesQueryStr)
+    })
+    .then(() => {
+      const insertedHistoriesQueryStr = format(
+        `INSERT INTO histories (userId, routineId, timestamp, totalTime) VALUES %L`,
+        historiesData.map(({userId, routineId, timestamp, time}) => [
+          userId,
+          routineId,
+          timestamp,
+          time
+        ])
+      )
+      return db.query(insertedHistoriesQueryStr)
+    })
 };
+
+module.exports = seed;
