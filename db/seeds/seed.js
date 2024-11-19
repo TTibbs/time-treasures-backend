@@ -10,7 +10,7 @@ const seed = ({
   levelsData,
 }) => {
   return db
-    .query(`DROP TABLE IF EXISTS histories;`)
+    .query(`DROP TABLE IF EXISTS histories`)
     .then(() => {
       return db.query(`DROP TABLE IF EXISTS routines`);
     })
@@ -26,7 +26,7 @@ const seed = ({
     .then(() => {
       return db.query(`
             CREATE TABLE levels (
-            levelId SERIAL PRIMARY KEY,
+            level_id SERIAL PRIMARY KEY,
             name VARCHAR NOT NULL,
             gems_lower INT NOT NULL,
             gems_upper INT
@@ -35,51 +35,53 @@ const seed = ({
     .then(() => {
       return db.query(`
             CREATE TABLE users (
-            userId SERIAL PRIMARY KEY,
+            user_id SERIAL PRIMARY KEY,
             username VARCHAR NOT NULL,
             email VARCHAR NOT NULL,
-            level INT NOT NULL DEFAULT 1 REFERENCES levels(levelId),
-            totalGems INT NOT NULL DEFAULT 0
+            level INT NOT NULL DEFAULT 1 REFERENCES levels(level_id),
+            total_gems INT NOT NULL DEFAULT 0
         )`);
     })
     .then(() => {
       return db.query(`
             CREATE TABLE tasks (
-            taskId SERIAL PRIMARY KEY NOT NULL,
-            userId INT REFERENCES users(userId),
-            taskName VARCHAR NOT NULL,
-            gemValue INT NOT NULL
+            task_id SERIAL PRIMARY KEY NOT NULL,
+            user_id INT REFERENCES users(user_id),
+            task_name VARCHAR NOT NULL,
+            gem_value INT NOT NULL
         )`);
     })
     .then(() => {
       return db.query(`
             CREATE TABLE routines (
-            routineId SERIAL PRIMARY KEY NOT NULL,
-            task_1 INT REFERENCES tasks(taskId) NOT NULL,
-            task_2 INT REFERENCES tasks(taskId) NOT NULL,
-            task_3 INT REFERENCES tasks(taskId),
-            task_4 INT REFERENCES tasks(taskId),
-            task_5 INT REFERENCES tasks(taskId),
-            task_6 INT REFERENCES tasks(taskId),
-            task_7 INT REFERENCES tasks(taskId),
-            task_8 INT REFERENCES tasks(taskId),
-            task_9 INT REFERENCES tasks(taskId),
-            task_10 INT REFERENCES tasks(taskId),
-            task_11 INT REFERENCES tasks(taskId),
-            task_12 INT REFERENCES tasks(taskId),
-            task_13 INT REFERENCES tasks(taskId),
-            task_14 INT REFERENCES tasks(taskId),
-            task_15 INT REFERENCES tasks(taskId),
-            targetTime INT NOT NULL
+            routine_id SERIAL PRIMARY KEY NOT NULL,
+            user_id INT REFERENCES users(user_id) NOT NUll,
+            task_1 INT REFERENCES tasks(task_id) NOT NULL,
+            task_2 INT REFERENCES tasks(task_id) NOT NULL,
+            task_3 INT REFERENCES tasks(task_id),
+            task_4 INT REFERENCES tasks(task_id),
+            task_5 INT REFERENCES tasks(task_id),
+            task_6 INT REFERENCES tasks(task_id),
+            task_7 INT REFERENCES tasks(task_id),
+            task_8 INT REFERENCES tasks(task_id),
+            task_9 INT REFERENCES tasks(task_id),
+            task_10 INT REFERENCES tasks(task_id),
+            task_11 INT REFERENCES tasks(task_id),
+            task_12 INT REFERENCES tasks(task_id),
+            task_13 INT REFERENCES tasks(task_id),
+            task_14 INT REFERENCES tasks(task_id),
+            task_15 INT REFERENCES tasks(task_id),
+            target_time INT NOT NULL
         )`);
     })
     .then(() => {
       return db.query(`
             CREATE TABLE histories (
-            userId INT REFERENCES users(userId),
-            routineId INT REFERENCES routines(routineId),
+            history_id SERIAL PRIMARY KEY NOT NULL,
+            user_id INT REFERENCES users(user_id),
+            routine_id INT REFERENCES routines(routine_id),
             timestamp TIMESTAMP DEFAULT NOW(),
-            totalTime INT NOT NULL
+            total_time INT NOT NULL
         )`);
     })
     .then(() => {
@@ -95,7 +97,7 @@ const seed = ({
     })
     .then(() => {
       const insertedUsersQueryStr = format(
-        `INSERT INTO users (username, email, level, totalGems) VALUES %L`,
+        `INSERT INTO users (username, email, level, total_gems) VALUES %L`,
         userData.map(({ username, email, level, totalGems }) => [
           username,
           email,
@@ -107,7 +109,7 @@ const seed = ({
     })
     .then(() => {
       const insertedTasksQueryStr = format(
-        `INSERT INTO tasks (userId, taskName, gemValue) VALUES %L`,
+        `INSERT INTO tasks (user_id, task_name, gem_value) VALUES %L`,
         tasksData.map(({ userId, taskName, gemValue }) => [
           userId,
           taskName,
@@ -120,31 +122,32 @@ const seed = ({
       const formattedData = routinesData.map((routine) => {
         return formatRoutineTasks(routine)
       })
+      console.log(formattedData)
       const insertedRoutinesQueryStr = format(
-        `INSERT INTO routines (userID, 
-        tasks_1, 
-        tasks_2, 
-        tasks_3, 
-        tasks_4, 
-        tasks_5, 
-        tasks_6,
-        tasks_7, 
-        tasks_8, 
-        tasks_9, 
-        tasks_10, 
-        tasks_11, 
-        tasks_12,
-        tasks_13,
-        tasks_14,
-        tasks_15,
-        targetTime) VALUES %L`,
+        `INSERT INTO routines (user_id, 
+        task_1, 
+        task_2, 
+        task_3, 
+        task_4, 
+        task_5, 
+        task_6,
+        task_7, 
+        task_8, 
+        task_9, 
+        task_10, 
+        task_11, 
+        task_12,
+        task_13,
+        task_14,
+        task_15,
+        target_time) VALUES %L`,
         formattedData
       );
       return db.query(insertedRoutinesQueryStr)
     })
     .then(() => {
       const insertedHistoriesQueryStr = format(
-        `INSERT INTO histories (userId, routineId, timestamp, totalTime) VALUES %L`,
+        `INSERT INTO histories (user_id, routine_id, timestamp, total_time) VALUES %L`,
         historiesData.map(({userId, routineId, timestamp, time}) => [
           userId,
           routineId,

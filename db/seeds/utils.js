@@ -6,7 +6,8 @@ exports.formatRoutineTasks = (obj) => {
         tasks.length = 15
         tasks.fill(null, endIndex, 15)
     }
-    tasks.unshift(userId)
-    tasks.push(targetTime)
-    return tasks
+    const formattedData = [userId]
+    tasks.forEach(task => formattedData.push(task))
+    formattedData.push(targetTime)
+    return formattedData
 }
