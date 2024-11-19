@@ -16,11 +16,3 @@ exports.selectUserById = (user_id) => {
       return rows[0];
     });
 };
-
-exports.selectUserByUsername = (username) => {
-  return db
-    .query(`SELECT * FROM users WHERE username = $1`, [username])
-    .then(({ rows }) => {
-      return rows[0];
-    });
-};

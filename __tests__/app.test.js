@@ -24,7 +24,7 @@ describe("Test of Seeds", () => {
     return db.query("SELECT * FROM tasks;").then(({ rows }) => {
       rows.forEach((row) => {
         expect(row).toHaveProperty("task_id", expect.any(Number));
-        expect(row).toHaveProperty("user_id", expect.any(Number));
+        expect(row).toHaveProperty("user_id");
         expect(row).toHaveProperty("task_name", expect.any(String));
         expect(row).toHaveProperty("gem_value", expect.any(Number));
       });
@@ -103,7 +103,35 @@ describe("Testing the API", () => {
         });
     });
   });
-  describe("Testing the tasks endpoint", () => {});
+  describe("Testing the tasks endpoint", () => {
+    test("Should return an array of tasks", () => {
+      return request(app)
+        .get("/api/tasks")
+        .expect(200)
+        .then(({ body: { tasks } }) => {
+          expect(tasks).toHaveLength(30);
+          tasks.forEach((task) => {
+            expect([expect.any(Number), null]).toContainEqual(task.user_id);
+            expect(task).toHaveProperty("task_name", expect.any(String));
+            expect(task).toHaveProperty("gem_value", expect.any(Number));
+          });
+        });
+    });
+    test("Should return an array of tasks by the user id", () => {
+      return request(app)
+        .get("/api/tasks/1")
+        .expect(200)
+        .then(({ body: { tasks } }) => {
+          console.log(tasks);
+          expect(tasks).toHaveLength(8);
+          tasks.forEach((task) => {
+            expect([expect.any(Number), null]).toContainEqual(task.user_id);
+            expect(task).toHaveProperty("task_name", expect.any(String));
+            expect(task).toHaveProperty("gem_value", expect.any(Number));
+          });
+        });
+    });
+  });
 });
 
 describe("Testing the endpoint errors", () => {
