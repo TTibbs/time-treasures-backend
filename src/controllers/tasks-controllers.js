@@ -1,4 +1,8 @@
-const { selectTasks, selectTaskByUserId } = require("../models/tasks-models");
+const {
+  selectTasks,
+  selectTaskByUserId,
+  selectDefaultTasks,
+} = require("../models/tasks-models");
 
 exports.getTasks = (req, res, next) => {
   selectTasks()

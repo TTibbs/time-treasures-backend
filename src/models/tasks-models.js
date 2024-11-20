@@ -7,8 +7,9 @@ exports.selectTasks = () => {
 };
 
 exports.selectTaskByUserId = (user_id) => {
+  
   return db
-    .query(`SELECT * FROM tasks WHERE tasks.user_id = $1`, [user_id])
+    .query(`SELECT * FROM tasks WHERE tasks.user_id = $1 OR is_default = true`, [user_id])
     .then(({ rows }) => {
       if (rows.length === 0) {
         return Promise.reject({

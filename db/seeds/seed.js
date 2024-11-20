@@ -37,7 +37,8 @@ const seed = ({
             task_id SERIAL PRIMARY KEY NOT NULL,
             user_id INT REFERENCES users(user_id),
             task_name VARCHAR NOT NULL,
-            gem_value INT NOT NULL
+            gem_value INT NOT NULL,
+            is_default BOOLEAN NOT NULL
         )`);
     })
     .then(() => {
@@ -88,11 +89,12 @@ const seed = ({
     })
     .then(() => {
       const insertedTasksQueryStr = format(
-        `INSERT INTO tasks (user_id, task_name, gem_value) VALUES %L`,
-        tasksData.map(({ userId, taskName, gemValue }) => [
+        `INSERT INTO tasks (user_id, task_name, gem_value, is_default) VALUES %L`,
+        tasksData.map(({ userId, taskName, gemValue, isDefault }) => [
           userId,
           taskName,
           gemValue,
+          isDefault,
         ])
       );
       return db.query(insertedTasksQueryStr);
