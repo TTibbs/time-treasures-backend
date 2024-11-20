@@ -119,7 +119,7 @@ describe("Testing the API", () => {
     });
     test("GET: /tasks/:user_id - Should return an array of tasks by the user id plus default tasks", () => {
       return request(app)
-        .get("/api/tasks/1")
+        .get("/api/users/1/tasks")
         .expect(200)
         .then(({ body: { tasks } }) => {
           expect(tasks).toHaveLength(8);
@@ -131,19 +131,46 @@ describe("Testing the API", () => {
           });
         });
     });
-    test("GET: /tasks/:user_id - returns array of only default tasks when user_id is null (ie: no user signed in)", () => {
+    test("GET: /:user_id/tasks - returns array of only default tasks when user has no custom tasks", () => {
       return request(app)
-        .get("/api/tasks/0")
+        .get(`/api/users/800/tasks`) //Would we ever need to have a screen where tasks are called but no user is signed in? 
         .expect(200)
         .then(({ body: { tasks } }) => {
           expect(tasks).toHaveLength(3)
           tasks.forEach((task) => {
-            expect(task).toHaveProperty("user_id", null);
+            expect(task).toHaveProperty("user_id", null); //confusion - null vs 0? 
             expect(task).toHaveProperty("task_name", expect.any(String));
             expect(task).toHaveProperty("gem_value", expect.any(Number));
             expect(task).toHaveProperty("is_default", true)
           })
         });
+    })
+    test("GET: /tasks/:task_id - returns an array containing a single task object", () =>{
+      return request(app)
+      .get(`/api/tasks/1`)
+      .expect(200)
+      .then(({body: {task}}) => {
+        expect(Array.isArray(task)).toBe(false)
+        expect(typeof task).toBe("object")
+        expect(task.task_name).toBe("Brush Teeth")
+        expect(task.gem_value).toBe(1)
+        expect(task.is_default).toBe(false)
+        expect(task.user_id).toBe(1)
+      })
+    })
+    test("GET: /users/:user_id/routines returns an array of routine objects ", () =>{
+      return request(app)
+      .get(`/api/users/1/routines`)
+      .expect(200)
+      .then(({body: { routines }}) => {
+        expect(Array.isArray(routines)).toBe(true)
+        routines.forEach(routine => {
+          expect(routine).toHaveProperty("routine_id", expect.any(Number)
+          expect(routine).toHave)
+        })
+
+       
+      })
     })
   });
 });

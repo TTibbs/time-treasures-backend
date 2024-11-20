@@ -1,7 +1,9 @@
 const {
   selectTasks,
   selectTaskByUserId,
-  selectDefaultTasks,
+  // selectDefaultTasks,
+  selectTaskByTaskId
+
 } = require("../models/tasks-models");
 
 exports.getTasks = (req, res, next) => {
@@ -24,3 +26,14 @@ exports.getTasksByUserId = (req, res, next) => {
       next(err);
     });
 };
+
+exports.getTaskByTaskId = (req, res, next) => {
+  const { task_id } = req.params
+  selectTaskByTaskId(task_id)
+  .then((task)=>{
+    res.status(200).send({ task })
+  })
+  .catch((err) => {
+    next(err)
+  })
+}

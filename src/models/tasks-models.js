@@ -14,9 +14,26 @@ exports.selectTaskByUserId = (user_id) => {
       if (rows.length === 0) {
         return Promise.reject({
           status: 404,
-          msg: "User doesn't have any tasks",
+          msg: "Error retrieving tasks",
         });
       }
       return rows;
     });
 };
+
+exports.selectTaskByTaskId = (task_id) => {
+   
+  return db
+  .query(`SELECT * FROM tasks WHERE task_id = $1`, [task_id])
+  .then(({ rows }) => {
+    if (rows.length === 0) {
+      return Promise.reject({
+        status: 404, 
+        msg: "Task not Found"
+      })
+    }
+
+    return rows[0]
+
+  })
+}
