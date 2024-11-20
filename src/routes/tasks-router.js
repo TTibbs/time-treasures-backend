@@ -1,12 +1,11 @@
 const tasksRouter = require("express").Router();
 const {
   getTasks,
-  getTasksByUserId,
-  getDefaultTasks,
+  getTaskByTaskId
 } = require("../controllers/tasks-controllers");
 
 tasksRouter.get("/", getTasks);
-tasksRouter.get("/:user_id", getTasksByUserId);
+tasksRouter.get("/:task_id", getTaskByTaskId);
 
 
 module.exports = tasksRouter;
