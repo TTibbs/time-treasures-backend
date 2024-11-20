@@ -158,22 +158,69 @@ describe("Testing the API", () => {
         expect(task.user_id).toBe(1)
       })
     })
+    
     test("GET: /users/:user_id/routines returns an array of routine objects ", () =>{
       return request(app)
       .get(`/api/users/1/routines`)
       .expect(200)
       .then(({body: { routines }}) => {
         expect(Array.isArray(routines)).toBe(true)
+        expect(routines).toHaveLength(2)
         routines.forEach(routine => {
-          expect(routine).toHaveProperty("routine_id", expect.any(Number)
-          expect(routine).toHave)
+          expect(routine).toHaveProperty("routine_id", expect.any(Number))
+          expect(routine).toHaveProperty("user_id", expect.any(Number))
+          expect(routine).toHaveProperty("task_1", expect.any(Number))
+          expect(routine).toHaveProperty("task_2", expect.any(Number))
+          expect(routine).toHaveProperty("task_3", expect.any(Number))
+          const expectedProperties = ["task_4","task_5", "task_6", "task_7", "task_8", "task_9", "task_10", "task_11", "task_12", "task_13", "task_14", "task_15",]
+          expectedProperties.forEach((property) => {
+            expect(routine).toHaveProperty(property)
+          })
+          expect(routine).toHaveProperty("target_time", expect.any(Number))
         })
+      })
+    })
+    test("GET 404: /users/:user_id/routines returns an error when given a valid but non-existent user_id", () => {
+      return request(app)
+      .get(`/api/users/999/routines`)
+      .expect(404)
+      .then(({body: { msg }}) => {
+        expect(msg).toBe("Error retrieving routines")
+      })
+    });
 
-       
+    test("GET 200: /routines/:routine_id returns a single routine object", () => {
+      return request(app)
+      .get(`/api/routines/1`)
+      .expect(200)
+      .then(({body: { routine }}) => {
+        expect(typeof routine).toBe("object")
+        expect(routine.user_id).toBe(1)
+        expect(routine.task_1).toBe(1)
+        expect(routine.task_2).toBe(2)
+        expect(routine.task_3).toBe(3)
+        expect(routine.target_time).toBe(300000)
+      })
+    })
+    test("GET 404: /routines/:routine_id returns an error for a non-existent but valid routine_id", () => {
+      return request(app)
+      .get(`/api/routines/67`)
+      .expect(404)
+      .then(({body: {msg}}) => {
+        expect(msg).toBe("Routine not found")
+      })
+    })
+    test("GET 400: /routines/:routine_id returns an error for a routine_id with an invalid data type", () => {
+      return request(app)
+      .get(`/api/routines/banana`)
+      .expect(400)
+      .then(({body: {msg}}) => {
+        expect(msg).toBe("Bad request")
       })
     })
   });
 });
+
 
 describe("Testing the endpoint errors", () => {
   test("Should return an error when the endpoint is invalid", () => {
