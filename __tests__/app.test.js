@@ -34,6 +34,7 @@ describe("Test of Seeds", () => {
     return db.query("SELECT * FROM routines;").then(({ rows }) => {
       rows.forEach((row) => {
         expect(row).toHaveProperty("routine_id", expect.any(Number));
+        expect(row).toHaveProperty("routine_name", expect.any(String))
         expect(row).toHaveProperty("user_id", expect.any(Number));
         expect(row).toHaveProperty("task_1");
         expect(row).toHaveProperty("task_2");
@@ -163,6 +164,7 @@ describe("Testing the API", () => {
             expect(routines).toHaveLength(2)
             routines.forEach(routine => {
               expect(routine).toHaveProperty("routine_id", expect.any(Number))
+              expect(routine).toHaveProperty("routine_name", expect.any(String))
               expect(routine).toHaveProperty("user_id", expect.any(Number))
               expect(routine).toHaveProperty("task_1", expect.any(Number))
               expect(routine).toHaveProperty("task_2", expect.any(Number))
@@ -191,7 +193,7 @@ describe("Testing the API", () => {
             expect(msg).toBe("Bad request")
           })
     });
-    test("POST: 201 /users/:user_id/tasks - inserts a new tasks and sends it back to the user as a body", ()=>{
+    test("POST: 201 /users/:user_id/tasks - inserts a new task and sends it back to the user as a body", ()=>{
       const newTask = {task_name: "tickle yourself", gem_value: 2}
       const expectedTask = {user_id: 1, task_name: "tickle yourself", gem_value: 2, is_default: false }
       return request(app)
@@ -202,9 +204,69 @@ describe("Testing the API", () => {
         expect(task).toMatchObject(expectedTask)
       })
     })
-    //404 valid buyt not present user 
-    //400 invalid user
-    //400 missing task name or gem value  
+    test("POST: 400 /users/:user_id/tasks - returns an error when passed a valid but non-existent user", () => {
+      const newTask = {task_name: "tickle yourself", gem_value: 2}
+      return request(app)
+      .post(`/api/users/999/tasks`)
+      .send(newTask)
+      .expect(400)
+      .then(( {body: {msg}}) => {
+        expect(msg).toBe("Bad request")
+      })
+    })
+    test("POST: 400 /users/:user_id/tasks - returns an error when passed a invalid user_id", () => {
+      const newTask = {task_name: "tickle yourself", gem_value: 2}
+      return request(app)
+      .post(`/api/users/kumquat/tasks`)
+      .send(newTask)
+      .expect(400)
+      .then(( {body: {msg}}) => {
+        expect(msg).toBe("Bad request")
+      })
+    })
+    test("POST: 400 /users/:user_id/tasks - returns an error if the task name is missing", () => {
+      const newTask = {gem_value: 2}
+      return request(app)
+      .post(`/api/users/1/tasks`)
+      .send(newTask)
+      .expect(400)
+      .then(( {body: {msg}}) => {
+        expect(msg).toBe("Missing input")
+      })
+    })
+    test("POST: 400 /users/:user_id/tasks - returns an error if the gem value is missing", () => {
+      const newTask = {task_name: "feed cat"}
+      return request(app)
+      .post(`/api/users/1/tasks`)
+      .send(newTask)
+      .expect(400)
+      .then(( {body: {msg}}) => {
+        expect(msg).toBe("Missing input")
+      })
+    })
+    test("POST: 201 /users/:user_id/routines - inserts a new routine and sends it back to the user as a body", () => {
+      const newRoutine = {routine_name: "Lunchtime routine", tasks: [1, 20, 3], target_time: 300000}
+      const expectedRoutine = {
+        routine_name: "Lunchtime routine", 
+        user_id: 1, 
+        task_1: 1, task_2: 20, task_3: 3, 
+        task_4: null, task_5: null, task_6: null,
+        task_7: null, task_8: null, task_9: null,
+        task_10: null, task_11: null, task_12: null,
+        task_13: null, task_14: null, task_15: null,
+        target_time: 300000}
+      return request(app)
+      .post(`/api/users/1/routines`)
+      .send(newRoutine)
+      .expect(201)
+      .then(( {body: {routine} })=>{
+        console.log(routine, "in test file")
+        expect(routine).toMatchObject(expectedRoutine)
+      })
+    })
+    // 400 returns an error when passed a valid but non-existent user
+    // 400 returns an error when passed an invalid user id
+    // 400 missing input
     });
     
     describe("Testing the tasks endpoint", () => {
