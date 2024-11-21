@@ -69,7 +69,7 @@ describe("Test of Seeds", () => {
 
 describe("Testing the API", () => {
   describe("Testing the users endpoint", () => {
-    test("Should return an array of users", () => {
+    test("GET: 200 /users Should return an array of users", () => {
       return request(app)
         .get("/api/users")
         .expect(200)
@@ -85,7 +85,7 @@ describe("Testing the API", () => {
           });
         });
     });
-    test("Should return an object for an individual user", () => {
+    test("GET: 200 /users/:user_id - returns an object for an individual user", () => {
       const user_id = 1;
       const testUser = {
         user_id: 1,
@@ -102,8 +102,112 @@ describe("Testing the API", () => {
           expect(user).toEqual(testUser);
         });
     });
-  });
-  describe("Testing the tasks endpoint", () => {
+    test("GET: 404 /users/:user_id - returns an error for non-existent user id", () => {
+      return request(app)
+        .get("/api/users/4000")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("User does not exist");
+        });
+    });
+    test("GET: 400 /users/:user_id - Should return an error for a invalid user_id", () => {
+      return request(app)
+        .get("/api/users/pear")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Bad request");
+        });
+    });
+    test("GET: 200 /users/:user_id/tasks - Should return an array of tasks by the user id plus default tasks", () => {
+        return request(app)
+          .get("/api/users/1/tasks")
+          .expect(200)
+          .then(({ body: { tasks } }) => {
+            expect(tasks).toHaveLength(8);
+            tasks.forEach((task) => {
+              expect([expect.any(Number), null]).toContainEqual(task.user_id);
+              expect(task).toHaveProperty("task_name", expect.any(String));
+              expect(task).toHaveProperty("gem_value", expect.any(Number));
+              expect(task).toHaveProperty("is_default")
+            });
+          });
+    });
+    test("GET: 200 /users/:user_id/tasks - returns array of only default tasks when user has no custom tasks or is not signed in", () => {
+      return request(app)
+        .get(`/api/users/800/tasks`) 
+        .expect(200)
+        .then(({ body: { tasks } }) => {
+          expect(tasks).toHaveLength(3)
+          tasks.forEach((task) => {
+            expect(task).toHaveProperty("user_id", null); //confusion - null vs 0? 
+            expect(task).toHaveProperty("task_name", expect.any(String));
+            expect(task).toHaveProperty("gem_value", expect.any(Number));
+            expect(task).toHaveProperty("is_default", true)
+          })
+        });
+    })
+    test("GET: 400 /users/:user_id/tasks - should return an error when passed an invalid user_id", () => {
+        return request(app)
+          .get("/api/users/banana/tasks")
+          .expect(400)
+          .then(({body: {msg}}) => {
+            expect(msg).toBe("Bad request")
+          })
+    })  
+    test("GET: 200 /users/:user_id/routines - returns an array of routine objects ", () =>{
+          return request(app)
+          .get(`/api/users/1/routines`)
+          .expect(200)
+          .then(({body: { routines }}) => {
+            expect(Array.isArray(routines)).toBe(true)
+            expect(routines).toHaveLength(2)
+            routines.forEach(routine => {
+              expect(routine).toHaveProperty("routine_id", expect.any(Number))
+              expect(routine).toHaveProperty("user_id", expect.any(Number))
+              expect(routine).toHaveProperty("task_1", expect.any(Number))
+              expect(routine).toHaveProperty("task_2", expect.any(Number))
+              expect(routine).toHaveProperty("task_3", expect.any(Number))
+              const expectedProperties = ["task_4","task_5", "task_6", "task_7", "task_8", "task_9", "task_10", "task_11", "task_12", "task_13", "task_14", "task_15",]
+              expectedProperties.forEach((property) => {
+                expect(routine).toHaveProperty(property)
+              })
+              expect(routine).toHaveProperty("target_time", expect.any(Number))
+            })
+          })
+    })
+    test("GET 404: /users/:user_id/routines - returns an error when given a valid but non-existent user_id", () => {
+          return request(app)
+          .get(`/api/users/999/routines`)
+          .expect(404)
+          .then(({body: { msg }}) => {
+            expect(msg).toBe("Error retrieving routines")
+          })
+    });
+    test("GET 400: /users/:user_id/routines - returns an error when passsed an invalid user_id", () => {
+          return request(app)
+          .get(`/api/users/kewi/routines`)
+          .expect(400)
+          .then(({body: { msg }}) => {
+            expect(msg).toBe("Bad request")
+          })
+    });
+    test("POST: 201 /users/:user_id/tasks - inserts a new tasks and sends it back to the user as a body", ()=>{
+      const newTask = {task_name: "tickle yourself", gem_value: 2}
+      const expectedTask = {user_id: 1, task_name: "tickle yourself", gem_value: 2, is_default: false }
+      return request(app)
+      .post(`/api/users/1/tasks`)
+      .send(newTask)
+      .expect(201)
+      .then(( {body: {task} })=>{
+        expect(task).toMatchObject(expectedTask)
+      })
+    })
+    //404 valid buyt not present user 
+    //400 invalid user
+    //400 missing task name or gem value  
+    });
+    
+    describe("Testing the tasks endpoint", () => {
     test("GET: /tasks - Should return an array of tasks", () => {
       return request(app)
         .get("/api/tasks")
@@ -117,35 +221,8 @@ describe("Testing the API", () => {
           });
         });
     });
-    test("GET: /tasks/:user_id - Should return an array of tasks by the user id plus default tasks", () => {
-      return request(app)
-        .get("/api/users/1/tasks")
-        .expect(200)
-        .then(({ body: { tasks } }) => {
-          expect(tasks).toHaveLength(8);
-          tasks.forEach((task) => {
-            expect([expect.any(Number), null]).toContainEqual(task.user_id);
-            expect(task).toHaveProperty("task_name", expect.any(String));
-            expect(task).toHaveProperty("gem_value", expect.any(Number));
-            expect(task).toHaveProperty("is_default")
-          });
-        });
-    });
-    test("GET: /:user_id/tasks - returns array of only default tasks when user has no custom tasks", () => {
-      return request(app)
-        .get(`/api/users/800/tasks`) //Would we ever need to have a screen where tasks are called but no user is signed in? 
-        .expect(200)
-        .then(({ body: { tasks } }) => {
-          expect(tasks).toHaveLength(3)
-          tasks.forEach((task) => {
-            expect(task).toHaveProperty("user_id", null); //confusion - null vs 0? 
-            expect(task).toHaveProperty("task_name", expect.any(String));
-            expect(task).toHaveProperty("gem_value", expect.any(Number));
-            expect(task).toHaveProperty("is_default", true)
-          })
-        });
-    })
-    test("GET: /tasks/:task_id - returns an array containing a single task object", () =>{
+
+    test("GET: 200 /tasks/:task_id - returns an array containing a single task object", () =>{
       return request(app)
       .get(`/api/tasks/1`)
       .expect(200)
@@ -158,37 +235,26 @@ describe("Testing the API", () => {
         expect(task.user_id).toBe(1)
       })
     })
-    
-    test("GET: /users/:user_id/routines returns an array of routine objects ", () =>{
+
+    test("GET: 400 /tasks/:task_id - returns an error message when passed and invalid datatype for :task_id", () =>{
       return request(app)
-      .get(`/api/users/1/routines`)
-      .expect(200)
-      .then(({body: { routines }}) => {
-        expect(Array.isArray(routines)).toBe(true)
-        expect(routines).toHaveLength(2)
-        routines.forEach(routine => {
-          expect(routine).toHaveProperty("routine_id", expect.any(Number))
-          expect(routine).toHaveProperty("user_id", expect.any(Number))
-          expect(routine).toHaveProperty("task_1", expect.any(Number))
-          expect(routine).toHaveProperty("task_2", expect.any(Number))
-          expect(routine).toHaveProperty("task_3", expect.any(Number))
-          const expectedProperties = ["task_4","task_5", "task_6", "task_7", "task_8", "task_9", "task_10", "task_11", "task_12", "task_13", "task_14", "task_15",]
-          expectedProperties.forEach((property) => {
-            expect(routine).toHaveProperty(property)
-          })
-          expect(routine).toHaveProperty("target_time", expect.any(Number))
-        })
+      .get(`/api/tasks/watermelon`)
+      .expect(400)
+      .then(({body: {msg}}) => {
+        expect(msg).toBe("Bad request")
       })
     })
-    test("GET 404: /users/:user_id/routines returns an error when given a valid but non-existent user_id", () => {
+    test("GET: 404 /tasks/:task_id - returns an error message when passed a valid but non-existant task_id", () =>{
       return request(app)
-      .get(`/api/users/999/routines`)
+      .get(`/api/tasks/9999`)
       .expect(404)
-      .then(({body: { msg }}) => {
-        expect(msg).toBe("Error retrieving routines")
+      .then(({body: {msg}}) => {
+        expect(msg).toBe("Task not Found")
       })
-    });
+    })
+  })
 
+  describe("Testing the routine endpoint", () => {
     test("GET 200: /routines/:routine_id returns a single routine object", () => {
       return request(app)
       .get(`/api/routines/1`)
@@ -218,8 +284,10 @@ describe("Testing the API", () => {
         expect(msg).toBe("Bad request")
       })
     })
-  });
-});
+  }); 
+})
+    
+
 
 
 describe("Testing the endpoint errors", () => {
@@ -231,12 +299,5 @@ describe("Testing the endpoint errors", () => {
         expect(msg).toBe("Invalid input");
       });
   });
-  test("Should return an error for non-existent user id", () => {
-    return request(app)
-      .get("/api/users/4000")
-      .expect(404)
-      .then(({ body: { msg } }) => {
-        expect(msg).toBe("User does not exist");
-      });
-  });
+ 
 });

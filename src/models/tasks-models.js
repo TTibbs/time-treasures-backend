@@ -37,3 +37,13 @@ exports.selectTaskByTaskId = (task_id) => {
 
   })
 }
+
+exports.createTaskByUserId = (user_id, {task_name, gem_value} ) => {
+  return db
+  .query(`INSERT INTO tasks (user_id, task_name, gem_value, is_default)
+    VALUES ($1, $2, $3, false)
+    RETURNING *;`, [user_id, task_name, gem_value])
+  .then(({ rows }) => {
+    return rows[0]
+  })
+}
