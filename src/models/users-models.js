@@ -19,8 +19,26 @@ exports.selectUserById = (user_id) => {
 
 exports.updateUserById = (user_id, keyToPatch) => {
   return db
-    .query(`UPDATE users SET ${keyToPatch[0]} = $1 WHERE user_id = $2 RETURNING *;`, [keyToPatch[1],user_id])
-    .then(({rows}) => {
-      return rows[0]
+    .query(
+      `UPDATE users SET ${keyToPatch[0]} = $1 WHERE user_id = $2 RETURNING *;`,
+      [keyToPatch[1], user_id]
+    )
+    .then(({ rows }) => {
+      return rows[0];
     });
-}
+};
+
+exports.selectUserForHistoryPost = (newHistoryPost) => {
+  const { user_id, routineId, timestamp, time } = newHistoryPost;
+  return db
+    .query(
+      `INSERT INTO histories (user_id, routine_id, timestamp, total_time) VALUES ($1, $2, $3, $4) RETURNING *;`,
+      [user_id, routineId, timestamp, time]
+    )
+    .then(({ rows }) => {
+      return rows[0];
+    })
+    .catch((err) => {
+      next(err);
+    });
+};

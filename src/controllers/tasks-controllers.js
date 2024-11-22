@@ -3,7 +3,7 @@ const {
   selectTaskByUserId,
   // selectDefaultTasks,
   selectTaskByTaskId,
-  createTaskByUserId
+  createTaskByUserId,
 } = require("../models/tasks-models");
 
 exports.getTasks = (req, res, next) => {
@@ -28,24 +28,24 @@ exports.getTasksByUserId = (req, res, next) => {
 };
 
 exports.getTaskByTaskId = (req, res, next) => {
-  const { task_id } = req.params
+  const { task_id } = req.params;
   selectTaskByTaskId(task_id)
-  .then((task)=>{
-    res.status(200).send({ task })
-  })
-  .catch((err) => {
-    next(err)
-  })
-}
+    .then((task) => {
+      res.status(200).send({ task });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
 
 exports.postTaskByUserId = (req, res, next) => {
-  const { user_id } = req.params
-  const newTask = req.body
+  const { user_id } = req.params;
+  const newTask = req.body;
   createTaskByUserId(user_id, newTask)
-  .then((task)=>{
-    res.status(201).send({ task })
-  })
-  .catch((err) => {
-    next(err)
-  })
-}
+    .then((task) => {
+      res.status(201).send({ task });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};

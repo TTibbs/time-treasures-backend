@@ -1,10 +1,11 @@
-const { selectHistories } = require("../models/histories-models")
-
+const { selectHistories } = require("../models/histories-models");
 
 exports.getHistory = (req, res, next) => {
-    selectHistories()
+  selectHistories()
     .then((histories) => {
-        res.status(200).send({ histories })
+      res.status(200).send({ histories });
     })
-    .next(err)
-}
+    .catch((err) => {
+      next(err);
+    });
+};

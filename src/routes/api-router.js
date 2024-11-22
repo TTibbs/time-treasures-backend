@@ -12,7 +12,7 @@ apiRouter.get("/", (req, res) => {
 
 apiRouter.use("/users", usersRouter);
 apiRouter.use("/tasks", tasksRouter);
-apiRouter.use("/routines", routinesRouter)
-apiRouter.use("/histories", historiesRouter)
+apiRouter.use("/routines", routinesRouter);
+apiRouter.use("/histories", historiesRouter);
 
 module.exports = apiRouter;

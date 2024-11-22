@@ -34,7 +34,7 @@ describe("Test of Seeds", () => {
     return db.query("SELECT * FROM routines;").then(({ rows }) => {
       rows.forEach((row) => {
         expect(row).toHaveProperty("routine_id", expect.any(Number));
-        expect(row).toHaveProperty("routine_name", expect.any(String))
+        expect(row).toHaveProperty("routine_name", expect.any(String));
         expect(row).toHaveProperty("user_id", expect.any(Number));
         expect(row).toHaveProperty("task_1");
         expect(row).toHaveProperty("task_2");
@@ -120,245 +120,307 @@ describe("Testing the API", () => {
         });
     });
     test("GET: 200 /users/:user_id/tasks - Should return an array of tasks by the user id plus default tasks", () => {
-        return request(app)
-          .get("/api/users/1/tasks")
-          .expect(200)
-          .then(({ body: { tasks } }) => {
-            expect(tasks).toHaveLength(8);
-            tasks.forEach((task) => {
-              expect([expect.any(Number), null]).toContainEqual(task.user_id);
-              expect(task).toHaveProperty("task_name", expect.any(String));
-              expect(task).toHaveProperty("gem_value", expect.any(Number));
-              expect(task).toHaveProperty("is_default")
-            });
+      return request(app)
+        .get("/api/users/1/tasks")
+        .expect(200)
+        .then(({ body: { tasks } }) => {
+          expect(tasks).toHaveLength(8);
+          tasks.forEach((task) => {
+            expect([expect.any(Number), null]).toContainEqual(task.user_id);
+            expect(task).toHaveProperty("task_name", expect.any(String));
+            expect(task).toHaveProperty("gem_value", expect.any(Number));
+            expect(task).toHaveProperty("is_default");
           });
+        });
     });
     test("GET: 200 /users/:user_id/tasks - returns array of only default tasks when user has no custom tasks or is not signed in", () => {
       return request(app)
-        .get(`/api/users/800/tasks`) 
+        .get(`/api/users/800/tasks`)
         .expect(200)
         .then(({ body: { tasks } }) => {
-          expect(tasks).toHaveLength(3)
+          expect(tasks).toHaveLength(3);
           tasks.forEach((task) => {
-            expect(task).toHaveProperty("user_id", null); //confusion - null vs 0? 
+            expect(task).toHaveProperty("user_id", null); //confusion - null vs 0?
             expect(task).toHaveProperty("task_name", expect.any(String));
             expect(task).toHaveProperty("gem_value", expect.any(Number));
-            expect(task).toHaveProperty("is_default", true)
-          })
+            expect(task).toHaveProperty("is_default", true);
+          });
         });
-    })
+    });
     test("GET: 400 /users/:user_id/tasks - should return an error when passed an invalid user_id", () => {
-        return request(app)
-          .get("/api/users/banana/tasks")
-          .expect(400)
-          .then(({body: {msg}}) => {
-            expect(msg).toBe("Bad request")
-          })
-    })  
-    test("GET: 200 /users/:user_id/routines - returns an array of routine objects ", () =>{
-          return request(app)
-          .get(`/api/users/1/routines`)
-          .expect(200)
-          .then(({body: { routines }}) => {
-            expect(Array.isArray(routines)).toBe(true)
-            expect(routines).toHaveLength(2)
-            routines.forEach(routine => {
-              expect(routine).toHaveProperty("routine_id", expect.any(Number))
-              expect(routine).toHaveProperty("routine_name", expect.any(String))
-              expect(routine).toHaveProperty("user_id", expect.any(Number))
-              expect(routine).toHaveProperty("task_1", expect.any(Number))
-              expect(routine).toHaveProperty("task_2", expect.any(Number))
-              expect(routine).toHaveProperty("task_3", expect.any(Number))
-              const expectedProperties = ["task_4","task_5", "task_6", "task_7", "task_8", "task_9", "task_10", "task_11", "task_12", "task_13", "task_14", "task_15",]
-              expectedProperties.forEach((property) => {
-                expect(routine).toHaveProperty(property)
-              })
-              expect(routine).toHaveProperty("target_time", expect.any(Number))
-            })
-          })
-    })
+      return request(app)
+        .get("/api/users/banana/tasks")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Bad request");
+        });
+    });
+    test("GET: 200 /users/:user_id/routines - returns an array of routine objects ", () => {
+      return request(app)
+        .get(`/api/users/1/routines`)
+        .expect(200)
+        .then(({ body: { routines } }) => {
+          expect(Array.isArray(routines)).toBe(true);
+          expect(routines).toHaveLength(2);
+          routines.forEach((routine) => {
+            expect(routine).toHaveProperty("routine_id", expect.any(Number));
+            expect(routine).toHaveProperty("routine_name", expect.any(String));
+            expect(routine).toHaveProperty("user_id", expect.any(Number));
+            expect(routine).toHaveProperty("task_1", expect.any(Number));
+            expect(routine).toHaveProperty("task_2", expect.any(Number));
+            expect(routine).toHaveProperty("task_3", expect.any(Number));
+            const expectedProperties = [
+              "task_4",
+              "task_5",
+              "task_6",
+              "task_7",
+              "task_8",
+              "task_9",
+              "task_10",
+              "task_11",
+              "task_12",
+              "task_13",
+              "task_14",
+              "task_15",
+            ];
+            expectedProperties.forEach((property) => {
+              expect(routine).toHaveProperty(property);
+            });
+            expect(routine).toHaveProperty("target_time", expect.any(Number));
+          });
+        });
+    });
     test("GET 404: /users/:user_id/routines - returns an error when given a valid but non-existent user_id", () => {
-          return request(app)
-          .get(`/api/users/999/routines`)
-          .expect(404)
-          .then(({body: { msg }}) => {
-            expect(msg).toBe("Error retrieving routines")
-          })
+      return request(app)
+        .get(`/api/users/999/routines`)
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Error retrieving routines");
+        });
     });
     test("GET 400: /users/:user_id/routines - returns an error when passsed an invalid user_id", () => {
-          return request(app)
-          .get(`/api/users/kewi/routines`)
-          .expect(400)
-          .then(({body: { msg }}) => {
-            expect(msg).toBe("Bad request")
-          })
+      return request(app)
+        .get(`/api/users/kewi/routines`)
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Bad request");
+        });
     });
-    test("POST: 201 /users/:user_id/tasks - inserts a new task and sends it back to the user as a body", ()=>{
-      const newTask = {task_name: "tickle yourself", gem_value: 2}
-      const expectedTask = {user_id: 1, task_name: "tickle yourself", gem_value: 2, is_default: false }
+    test("POST: 201 /users/:user_id/tasks - inserts a new task and sends it back to the user as a body", () => {
+      const newTask = { task_name: "tickle yourself", gem_value: 2 };
+      const expectedTask = {
+        user_id: 1,
+        task_name: "tickle yourself",
+        gem_value: 2,
+        is_default: false,
+      };
       return request(app)
-      .post(`/api/users/1/tasks`)
-      .send(newTask)
-      .expect(201)
-      .then(( {body: {task} })=>{
-        expect(task).toMatchObject(expectedTask)
-      })
-    })
+        .post(`/api/users/1/tasks`)
+        .send(newTask)
+        .expect(201)
+        .then(({ body: { task } }) => {
+          expect(task).toMatchObject(expectedTask);
+        });
+    });
     test("POST: 400 /users/:user_id/tasks - returns an error when passed a valid but non-existent user", () => {
-      const newTask = {task_name: "tickle yourself", gem_value: 2}
+      const newTask = { task_name: "tickle yourself", gem_value: 2 };
       return request(app)
-      .post(`/api/users/999/tasks`)
-      .send(newTask)
-      .expect(400)
-      .then(( {body: {msg}}) => {
-        expect(msg).toBe("Bad request")
-      })
-    })
+        .post(`/api/users/999/tasks`)
+        .send(newTask)
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Bad request");
+        });
+    });
     test("POST: 400 /users/:user_id/tasks - returns an error when passed a invalid user_id", () => {
-      const newTask = {task_name: "tickle yourself", gem_value: 2}
+      const newTask = { task_name: "tickle yourself", gem_value: 2 };
       return request(app)
-      .post(`/api/users/kumquat/tasks`)
-      .send(newTask)
-      .expect(400)
-      .then(( {body: {msg}}) => {
-        expect(msg).toBe("Bad request")
-      })
-    })
+        .post(`/api/users/kumquat/tasks`)
+        .send(newTask)
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Bad request");
+        });
+    });
     test("POST: 400 /users/:user_id/tasks - returns an error if the task name is missing", () => {
-      const newTask = {gem_value: 2}
+      const newTask = { gem_value: 2 };
       return request(app)
-      .post(`/api/users/1/tasks`)
-      .send(newTask)
-      .expect(400)
-      .then(( {body: {msg}}) => {
-        expect(msg).toBe("Missing input")
-      })
-    })
+        .post(`/api/users/1/tasks`)
+        .send(newTask)
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Missing input");
+        });
+    });
     test("POST: 400 /users/:user_id/tasks - returns an error if the gem value is missing", () => {
-      const newTask = {task_name: "feed cat"}
+      const newTask = { task_name: "feed cat" };
       return request(app)
-      .post(`/api/users/1/tasks`)
-      .send(newTask)
-      .expect(400)
-      .then(( {body: {msg}}) => {
-        expect(msg).toBe("Missing input")
-      })
-    })
+        .post(`/api/users/1/tasks`)
+        .send(newTask)
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Missing input");
+        });
+    });
     test("POST: 201 /users/:user_id/routines - inserts a new routine and sends it back to the user as a body", () => {
-      const newRoutine = {routine_name: "Lunchtime routine", tasks: [1, 20, 3], target_time: 300000}
+      const newRoutine = {
+        routine_name: "Lunchtime routine",
+        tasks: [1, 20, 3],
+        target_time: 300000,
+      };
       const expectedRoutine = {
-        routine_name: "Lunchtime routine", 
-        user_id: 1, 
-        task_1: 1, task_2: 20, task_3: 3, 
-        task_4: null, task_5: null, task_6: null,
-        task_7: null, task_8: null, task_9: null,
-        task_10: null, task_11: null, task_12: null,
-        task_13: null, task_14: null, task_15: null,
-        target_time: 300000}
+        routine_name: "Lunchtime routine",
+        user_id: 1,
+        task_1: 1,
+        task_2: 20,
+        task_3: 3,
+        task_4: null,
+        task_5: null,
+        task_6: null,
+        task_7: null,
+        task_8: null,
+        task_9: null,
+        task_10: null,
+        task_11: null,
+        task_12: null,
+        task_13: null,
+        task_14: null,
+        task_15: null,
+        target_time: 300000,
+      };
       return request(app)
-      .post(`/api/users/1/routines`)
-      .send(newRoutine)
-      .expect(201)
-      .then(( {body: {routine} })=>{
-        expect(routine).toMatchObject(expectedRoutine)
-      })
-    })
+        .post(`/api/users/1/routines`)
+        .send(newRoutine)
+        .expect(201)
+        .then(({ body: { routine } }) => {
+          expect(routine).toMatchObject(expectedRoutine);
+        });
+    });
     test("POST: 400 /users/:user_id/routines - returns an error when passed a valid but non-existent user", () => {
-      const newRoutine = {routine_name: "Breakfast routine", tasks: [1, 20, 3], target_time: 700000}
+      const newRoutine = {
+        routine_name: "Breakfast routine",
+        tasks: [1, 20, 3],
+        target_time: 700000,
+      };
       return request(app)
-      .post(`/api/users/999/routines`)
-      .send(newRoutine)
-      .expect(400)
-      .then(( {body: {msg}}) => {
-        expect(msg).toBe("Bad request")
-      })
-    })
+        .post(`/api/users/999/routines`)
+        .send(newRoutine)
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Bad request");
+        });
+    });
     test("POST: 400 /users/:user_id/routines - returns an error when passed a invalid user_id type", () => {
-      const newRoutine = {routine_name: "Breakfast routine", tasks: [1, 3], target_time: 706700}
+      const newRoutine = {
+        routine_name: "Breakfast routine",
+        tasks: [1, 3],
+        target_time: 706700,
+      };
       return request(app)
-      .post(`/api/users/strawberry/routines`)
-      .send(newRoutine)
-      .expect(400)
-      .then(( {body: {msg}}) => {
-        expect(msg).toBe("Bad request")
-      })
-    })
+        .post(`/api/users/strawberry/routines`)
+        .send(newRoutine)
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Bad request");
+        });
+    });
     test("POST: 400 /users/:user_id/routines - returns an error if the routine name is missing", () => {
-      const newRoutine = {tasks: [1, 3], target_time: 123456}
+      const newRoutine = { tasks: [1, 3], target_time: 123456 };
       return request(app)
-      .post(`/api/users/1/routines`)
-      .send(newRoutine)
-      .expect(400)
-      .then(( {body: {msg}}) => {
-        expect(msg).toBe("Missing input")
-      })
-    })
+        .post(`/api/users/1/routines`)
+        .send(newRoutine)
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Missing input");
+        });
+    });
     test("POST: 400 /users/:user_id/routines - returns an error if the routine name is missing", () => {
-      const newRoutine = {target_time: 123456}
+      const newRoutine = { target_time: 123456 };
       return request(app)
-      .post(`/api/users/1/routines`)
-      .send(newRoutine)
-      .expect(400)
-      .then(( {body: {msg}}) => {
-        expect(msg).toBe("Missing input")
-      })
-    })
+        .post(`/api/users/1/routines`)
+        .send(newRoutine)
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Missing input");
+        });
+    });
     test("PATCH: 202 /users/:user_id - updates the routine and returns a body to the client", () => {
       const updatedUser = {
         username: "Bob",
-      }
+      };
       return request(app)
-      .patch(`/api/users/1`)
-      .send(updatedUser)
-      .expect(202)
-      .then(( { body: {patchedUser} }) => {
-        expect(patchedUser.username).toBe("Bob")
-      })
-    })
-    test("PATCH: 202 /users/:user_id - updates the routine and returns correct body with gems updated", () => {
-      const updatedUser = {        
-        total_gems: 201,
-      }
-      return request(app)
-      .patch(`/api/users/1`)
-      .send(updatedUser)
-      .expect(202)
-      .then(( { body: {patchedUser} }) => {
-        expect(patchedUser.total_gems).toBe(201)
-      })
-    })
-
-    test("GET: 200 /history - returns an array of histories", () => {
-      return request(app)
-      .get(`/api/history`)
-      .expect(200)
-      .then(({ body: { histories} }) => {
-        
-        histories.forEach((history) =>{
-          expect(history).toHaveProperty("userId", expect.any(Number))
-          expect(history).toHaveProperty("routineId", expect.any(Number))
-          expect(history).toHaveProperty("timestamp", expect.any(String))
-          expect(history).toHaveProperty("time", expect.any(Number))        
-        })
-      })
-    })
-    // test("POST: 201 /users/:user_id/history - adds to routine to history table by user_id ", () => {
-    //   const completedRoutine = { userId: 1, routineId: 4, timestamp: "2024-11-18T08:00:00Z", time: 500000 }
-    //   return request(app)
-    //   .post(`/api/users/1/history`)
-    //   .send(completedRoutine)
-    //   .expect(202)
-    //   .then(( { body: {completedRoutine} }) => {
-    //     expect(completedRoutine).toHaveProperty("userId", 1)
-    //     expect(completedRoutine).toHaveProperty("routineId", 4)
-    //     expect(completedRoutine).toHaveProperty("timestamp", expect.any(String))
-    //     expect(completedRoutine).toHaveProperty("time", expect.any(Number))
-    //   })
-    // })
-    
+        .patch(`/api/users/1`)
+        .send(updatedUser)
+        .expect(202)
+        .then(({ body: { patchedUser } }) => {
+          expect(patchedUser.username).toBe("Bob");
+        });
     });
-    
-    describe("Testing the tasks endpoint", () => {
+    test("PATCH: 202 /users/:user_id - updates the routine and returns correct body with gems updated", () => {
+      const updatedUser = {
+        total_gems: 201,
+      };
+      return request(app)
+        .patch(`/api/users/1`)
+        .send(updatedUser)
+        .expect(202)
+        .then(({ body: { patchedUser } }) => {
+          expect(patchedUser.total_gems).toBe(201);
+        });
+    });
+    test("POST: 201 /users/:user_id/history - adds to routine to history table by user_id ", () => {
+      const completedRoutine = {
+        userId: 1,
+        routineId: 4,
+        timestamp: "2024-11-18T08:00:00Z",
+        time: 500000,
+      };
+      return request(app)
+        .post(`/api/users/1/histories`)
+        .send(completedRoutine)
+        .expect(201)
+        .then(({ body: { completedRoutine } }) => {
+          expect(completedRoutine).toHaveProperty("user_id", 1);
+          expect(completedRoutine).toHaveProperty("routine_id", 4);
+          expect(completedRoutine).toHaveProperty(
+            "timestamp",
+            expect.any(String)
+          );
+          expect(completedRoutine).toHaveProperty(
+            "total_time",
+            expect.any(Number)
+          );
+        });
+    });
+    test("POST: 400 /users/:user_id/history - returns error message when body is missing values", () => {
+      const incompleteRoutine = {
+        routineId: 4,
+      };
+      return request(app)
+        .post(`/api/users/1/histories`)
+        .send(incompleteRoutine)
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Bad request: Missing required fields");
+        });
+    });
+    test("POST: 404 /users/:user_id/history - returns error message when user_id is invalid", () => {
+      const completedRoutine = {
+        routineId: 4,
+        timestamp: "2024-11-18T08:00:00Z",
+        time: 500000,
+      };
+      return request(app)
+        .post(`/api/users/invalid/histories`)
+        .send(completedRoutine)
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("User not found");
+        });
+    });
+  });
+
+  describe("Testing the tasks endpoint", () => {
     test("GET: /tasks - Should return an array of tasks", () => {
       return request(app)
         .get("/api/tasks")
@@ -373,74 +435,87 @@ describe("Testing the API", () => {
         });
     });
 
-    test("GET: 200 /tasks/:task_id - returns an array containing a single task object", () =>{
+    test("GET: 200 /tasks/:task_id - returns an array containing a single task object", () => {
       return request(app)
-      .get(`/api/tasks/1`)
-      .expect(200)
-      .then(({body: {task}}) => {
-        expect(Array.isArray(task)).toBe(false)
-        expect(typeof task).toBe("object")
-        expect(task.task_name).toBe("Brush Teeth")
-        expect(task.gem_value).toBe(1)
-        expect(task.is_default).toBe(false)
-        expect(task.user_id).toBe(1)
-      })
-    })
+        .get(`/api/tasks/1`)
+        .expect(200)
+        .then(({ body: { task } }) => {
+          expect(Array.isArray(task)).toBe(false);
+          expect(typeof task).toBe("object");
+          expect(task.task_name).toBe("Brush Teeth");
+          expect(task.gem_value).toBe(1);
+          expect(task.is_default).toBe(false);
+          expect(task.user_id).toBe(1);
+        });
+    });
 
-    test("GET: 400 /tasks/:task_id - returns an error message when passed and invalid datatype for :task_id", () =>{
+    test("GET: 400 /tasks/:task_id - returns an error message when passed and invalid datatype for :task_id", () => {
       return request(app)
-      .get(`/api/tasks/watermelon`)
-      .expect(400)
-      .then(({body: {msg}}) => {
-        expect(msg).toBe("Bad request")
-      })
-    })
-    test("GET: 404 /tasks/:task_id - returns an error message when passed a valid but non-existant task_id", () =>{
+        .get(`/api/tasks/watermelon`)
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Bad request");
+        });
+    });
+    test("GET: 404 /tasks/:task_id - returns an error message when passed a valid but non-existant task_id", () => {
       return request(app)
-      .get(`/api/tasks/9999`)
-      .expect(404)
-      .then(({body: {msg}}) => {
-        expect(msg).toBe("Task not Found")
-      })
-    })
-  })
+        .get(`/api/tasks/9999`)
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Task not Found");
+        });
+    });
+  });
 
-   
   describe("Testing the routine endpoint", () => {
     test("GET 200: /routines/:routine_id returns a single routine object", () => {
       return request(app)
-      .get(`/api/routines/1`)
-      .expect(200)
-      .then(({body: { routine }}) => {
-        expect(typeof routine).toBe("object")
-        expect(routine.user_id).toBe(1)
-        expect(routine.task_1).toBe(1)
-        expect(routine.task_2).toBe(2)
-        expect(routine.task_3).toBe(3)
-        expect(routine.target_time).toBe(300000)
-      })
-    })
+        .get(`/api/routines/1`)
+        .expect(200)
+        .then(({ body: { routine } }) => {
+          expect(typeof routine).toBe("object");
+          expect(routine.user_id).toBe(1);
+          expect(routine.task_1).toBe(1);
+          expect(routine.task_2).toBe(2);
+          expect(routine.task_3).toBe(3);
+          expect(routine.target_time).toBe(300000);
+        });
+    });
     test("GET 404: /routines/:routine_id returns an error for a non-existent but valid routine_id", () => {
       return request(app)
-      .get(`/api/routines/67`)
-      .expect(404)
-      .then(({body: {msg}}) => {
-        expect(msg).toBe("Routine not found")
-      })
-    })
+        .get(`/api/routines/67`)
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Routine not found");
+        });
+    });
     test("GET 400: /routines/:routine_id returns an error for a routine_id with an invalid data type", () => {
       return request(app)
-      .get(`/api/routines/banana`)
-      .expect(400)
-      .then(({body: {msg}}) => {
-        expect(msg).toBe("Bad request")
-      })
-    })
-  }); 
-})
-    
+        .get(`/api/routines/banana`)
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Bad request");
+        });
+    });
+  });
 
-
+  describe("Testing the histories endpoint", () => {
+    test("GET: 200 /histories - returns an array of histories", () => {
+      return request(app)
+        .get(`/api/histories`)
+        .expect(200)
+        .then(({ body: { histories } }) => {
+          histories.forEach((history) => {
+            expect(history).toHaveProperty("history_id", expect.any(Number));
+            expect(history).toHaveProperty("user_id", expect.any(Number));
+            expect(history).toHaveProperty("routine_id", expect.any(Number));
+            expect(history).toHaveProperty("timestamp", expect.any(String));
+            expect(history).toHaveProperty("total_time", expect.any(Number));
+          });
+        });
+    });
+  });
+});
 
 describe("Testing the endpoint errors", () => {
   test("Should return an error when the endpoint is invalid", () => {
@@ -451,5 +526,4 @@ describe("Testing the endpoint errors", () => {
         expect(msg).toBe("Invalid input");
       });
   });
- 
 });
