@@ -260,7 +260,6 @@ describe("Testing the API", () => {
       .send(newRoutine)
       .expect(201)
       .then(( {body: {routine} })=>{
-        console.log(routine, "in test file")
         expect(routine).toMatchObject(expectedRoutine)
       })
     })
