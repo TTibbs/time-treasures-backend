@@ -263,9 +263,70 @@ describe("Testing the API", () => {
         expect(routine).toMatchObject(expectedRoutine)
       })
     })
-    // 400 returns an error when passed a valid but non-existent user
-    // 400 returns an error when passed an invalid user id
-    // 400 missing input
+    test("POST: 400 /users/:user_id/routines - returns an error when passed a valid but non-existent user", () => {
+      const newRoutine = {routine_name: "Breakfast routine", tasks: [1, 20, 3], target_time: 700000}
+      return request(app)
+      .post(`/api/users/999/routines`)
+      .send(newRoutine)
+      .expect(400)
+      .then(( {body: {msg}}) => {
+        expect(msg).toBe("Bad request")
+      })
+    })
+    test("POST: 400 /users/:user_id/routines - returns an error when passed a invalid user_id type", () => {
+      const newRoutine = {routine_name: "Breakfast routine", tasks: [1, 3], target_time: 706700}
+      return request(app)
+      .post(`/api/users/strawberry/routines`)
+      .send(newRoutine)
+      .expect(400)
+      .then(( {body: {msg}}) => {
+        expect(msg).toBe("Bad request")
+      })
+    })
+    test("POST: 400 /users/:user_id/routines - returns an error if the routine name is missing", () => {
+      const newRoutine = {tasks: [1, 3], target_time: 123456}
+      return request(app)
+      .post(`/api/users/1/routines`)
+      .send(newRoutine)
+      .expect(400)
+      .then(( {body: {msg}}) => {
+        expect(msg).toBe("Missing input")
+      })
+    })
+    test("POST: 400 /users/:user_id/routines - returns an error if the routine name is missing", () => {
+      const newRoutine = {target_time: 123456}
+      return request(app)
+      .post(`/api/users/1/routines`)
+      .send(newRoutine)
+      .expect(400)
+      .then(( {body: {msg}}) => {
+        expect(msg).toBe("Missing input")
+      })
+    })
+    test("PATCH: 202 /users/:user_id - updates the routine and returns a body to the client", () => {
+      const updatedUser = {
+        username: "Bob",
+      }
+      return request(app)
+      .patch(`/api/users/1`)
+      .send(updatedUser)
+      .expect(202)
+      .then(( { body: {patchedUser} }) => {
+        expect(patchedUser.username).toBe("Bob")
+      })
+    })
+    test("PATCH: 202 /users/:user_id - updates the routine and returns correct body with gems and level updated", () => {
+      const updatedUser = {        
+        total_gems: 201,
+      }
+      return request(app)
+      .patch(`/api/users/1`)
+      .send(updatedUser)
+      .expect(202)
+      .then(( { body: {patchedUser} }) => {
+        expect(patchedUser.total_gems).toBe(201)
+      })
+    })
     });
     
     describe("Testing the tasks endpoint", () => {

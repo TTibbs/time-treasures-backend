@@ -1,4 +1,4 @@
-const { selectUsers, selectUserById } = require("../models/users-models.js");
+const { selectUsers, selectUserById, updateUserById } = require("../models/users-models.js");
 
 exports.getUsers = (req, res, next) => {
   selectUsers()
@@ -19,6 +19,20 @@ exports.getUserById = (req, res, next) => {
     .catch((err) => {
       next(err);
     });
+};
+
+exports.patchUserById = (req, res, next) => {
+  const { user_id } = req.params;
+  const keyToPatch = Object.entries(req.body)[0]
+  const promises = [selectUserById(user_id), updateUserById(user_id, keyToPatch)]
+  Promise.all(promises)
+  .then((result) => {
+    const patchedUser = result[1]
+    res.status(202).send({ patchedUser })
+  })
+  .catch((err) => {
+    next(err);
+  })
 };
 
 

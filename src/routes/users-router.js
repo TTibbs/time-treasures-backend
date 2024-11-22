@@ -2,7 +2,7 @@ const usersRouter = require("express").Router();
 const {
   getUsers,
   getUserById,
-  
+  patchUserById
 } = require("../controllers/users-controllers.js");
 
 const { getTasksByUserId, postTaskByUserId } = require("../controllers/tasks-controllers.js")
@@ -14,5 +14,6 @@ usersRouter.get("/:user_id/tasks", getTasksByUserId);
 usersRouter.post("/:user_id/tasks", postTaskByUserId)
 usersRouter.get("/:user_id/routines", getRoutinesByUserId);
 usersRouter.post("/:user_id/routines", postRoutineByUserId)
+usersRouter.patch("/:user_id", patchUserById)
 
 module.exports = usersRouter;
