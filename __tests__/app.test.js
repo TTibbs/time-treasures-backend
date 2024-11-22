@@ -486,6 +486,14 @@ describe("Testing the API", () => {
           expect(msg).toBe("Task Not Found");
         });
     })
+    test("DELETE: 400 /tasks/:task_id - returns 400 when passed an invalid task id", () => {
+      return request(app)
+        .delete(`/api/tasks/not-an-id`)
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Bad request")
+        });
+    })
   });
 
   describe("Testing the routine endpoint", () => {
@@ -518,6 +526,35 @@ describe("Testing the API", () => {
           expect(msg).toBe("Bad request");
         });
     });
+
+    test("DELETE: 204 /routines/:routine_id - returns 204 and no content when task successfully deleted", () => {
+      return request(app)
+        .delete(`/api/routines/1`)
+        .expect(204)
+        .then(({body}) => {
+          expect(body).toEqual({})
+          return db.query("SELECT * FROM routines WHERE routine_id = 1;")
+          .then(({rows}) => {
+            expect(rows.length).toBe(0)
+          })
+        });
+    });
+    test("DELETE: 404 /routines/:routine_id - returns 404 when routine id not found", () => {
+      return request(app)
+        .delete(`/api/routines/9999`)
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Routine Not Found");
+        });
+    })
+    test("DELETE: 400 /routines/:routine_id - returns 400 when passed an invalid routine id", () => {
+      return request(app)
+        .delete(`/api/routines/not-an-id`)
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Bad request")
+        });
+    })
   });
 
   describe("Testing the histories endpoint", () => {
@@ -535,6 +572,7 @@ describe("Testing the API", () => {
           });
         });
     });
+    
   });
 });
 

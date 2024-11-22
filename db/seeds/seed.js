@@ -70,7 +70,7 @@ const seed = ({
             CREATE TABLE histories (
             history_id SERIAL PRIMARY KEY NOT NULL,
             user_id INT REFERENCES users(user_id),
-            routine_id INT REFERENCES routines(routine_id),
+            routine_id INT REFERENCES routines(routine_id) ON DELETE SET NULL,
             timestamp TIMESTAMP DEFAULT NOW(),
             total_time INT NOT NULL
         )`);

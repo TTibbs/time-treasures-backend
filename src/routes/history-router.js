@@ -1,4 +1,4 @@
-const { getHistory } = require("../controllers/histories-controllers");
+const { getHistory, postHistory } = require("../controllers/histories-controllers");
 
 const historiesRouter = require("express").Router();
 
