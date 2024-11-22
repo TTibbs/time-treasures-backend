@@ -457,7 +457,7 @@ describe("Testing the API", () => {
           expect(msg).toBe("Bad request");
         });
     });
-    test("GET: 404 /tasks/:task_id - returns an error message when passed a valid but non-existant task_id", () => {
+    test("GET: 404 /tasks/:task_id - returns an error message when passed a valid but non-existent task_id", () => {
       return request(app)
         .get(`/api/tasks/9999`)
         .expect(404)
@@ -465,6 +465,27 @@ describe("Testing the API", () => {
           expect(msg).toBe("Task not Found");
         });
     });
+
+    test("DELETE: 204 /tasks/:task_id - returns 204 and no content when task successfully deleted", () => {
+      return request(app)
+        .delete(`/api/tasks/1`)
+        .expect(204)
+        .then(({body}) => {
+          expect(body).toEqual({})
+          return db.query("SELECT * FROM tasks WHERE task_id = 1;")
+          .then(({rows}) => {
+            expect(rows.length).toBe(0)
+          })
+        });
+    });
+    test("DELETE: 404 /tasks/:task_id - returns 404 when task id not found", () => {
+      return request(app)
+        .delete(`/api/tasks/9999`)
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Task Not Found");
+        });
+    })
   });
 
   describe("Testing the routine endpoint", () => {

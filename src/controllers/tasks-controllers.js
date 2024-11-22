@@ -4,6 +4,7 @@ const {
   // selectDefaultTasks,
   selectTaskByTaskId,
   createTaskByUserId,
+  deleteTaskByTaskId,
 } = require("../models/tasks-models");
 
 exports.getTasks = (req, res, next) => {
@@ -44,6 +45,17 @@ exports.postTaskByUserId = (req, res, next) => {
   createTaskByUserId(user_id, newTask)
     .then((task) => {
       res.status(201).send({ task });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.deleteTask = (req, res, next) => {
+  const { task_id } = req.params;
+  deleteTaskByTaskId(task_id)
+    .then(({ status }) => {
+      res.status(status).send();
     })
     .catch((err) => {
       next(err);

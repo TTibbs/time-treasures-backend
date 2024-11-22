@@ -53,3 +53,16 @@ exports.createTaskByUserId = (user_id, { task_name, gem_value }) => {
       return rows[0];
     });
 };
+
+exports.deleteTaskByTaskId = (id) => {
+  return db.query("SELECT * FROM tasks WHERE task_id = $1", [id])
+  .then(({rows}) => {
+    if (rows.length === 0) {
+      return Promise.reject({status: 404, msg: "Task Not Found"})
+    }
+    return db.query("DELETE FROM tasks WHERE task_id = $1 RETURNING *;", [id])
+    .then(() => {
+      return {status: 204}
+    })
+  })
+}
