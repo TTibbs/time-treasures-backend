@@ -315,7 +315,7 @@ describe("Testing the API", () => {
         expect(patchedUser.username).toBe("Bob")
       })
     })
-    test("PATCH: 202 /users/:user_id - updates the routine and returns correct body with gems and level updated", () => {
+    test("PATCH: 202 /users/:user_id - updates the routine and returns correct body with gems updated", () => {
       const updatedUser = {        
         total_gems: 201,
       }
@@ -327,6 +327,35 @@ describe("Testing the API", () => {
         expect(patchedUser.total_gems).toBe(201)
       })
     })
+
+    test("GET: 200 /history - returns an array of histories", () => {
+      return request(app)
+      .get(`/api/history`)
+      .expect(200)
+      .then(({ body: { histories} }) => {
+        
+        histories.forEach((history) =>{
+          expect(history).toHaveProperty("userId", expect.any(Number))
+          expect(history).toHaveProperty("routineId", expect.any(Number))
+          expect(history).toHaveProperty("timestamp", expect.any(String))
+          expect(history).toHaveProperty("time", expect.any(Number))        
+        })
+      })
+    })
+    // test("POST: 201 /users/:user_id/history - adds to routine to history table by user_id ", () => {
+    //   const completedRoutine = { userId: 1, routineId: 4, timestamp: "2024-11-18T08:00:00Z", time: 500000 }
+    //   return request(app)
+    //   .post(`/api/users/1/history`)
+    //   .send(completedRoutine)
+    //   .expect(202)
+    //   .then(( { body: {completedRoutine} }) => {
+    //     expect(completedRoutine).toHaveProperty("userId", 1)
+    //     expect(completedRoutine).toHaveProperty("routineId", 4)
+    //     expect(completedRoutine).toHaveProperty("timestamp", expect.any(String))
+    //     expect(completedRoutine).toHaveProperty("time", expect.any(Number))
+    //   })
+    // })
+    
     });
     
     describe("Testing the tasks endpoint", () => {
@@ -376,6 +405,7 @@ describe("Testing the API", () => {
     })
   })
 
+   
   describe("Testing the routine endpoint", () => {
     test("GET 200: /routines/:routine_id returns a single routine object", () => {
       return request(app)
