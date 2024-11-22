@@ -12,4 +12,15 @@ exports.selectHistories = () => {
   });
 };
 
-
+exports.selectHistoriesByUserId = (id) => {
+  return db.query(`SELECT * FROM histories WHERE user_id = $1`, [id]).then(({ rows }) => {
+    
+    if (rows.length === 0) {
+      return Promise.reject({
+        status: 404,
+        msg: "History Not Found",
+      });
+    }
+    return { histories: rows }
+  });
+}

@@ -1,5 +1,5 @@
 const { response } = require("../app");
-const { selectHistories, insertHistory } = require("../models/histories-models");
+const { selectHistories, selectHistoriesByUserId } = require("../models/histories-models");
 
 exports.getHistory = (req, res, next) => {
   selectHistories()
@@ -11,4 +11,14 @@ exports.getHistory = (req, res, next) => {
     });
 };
 
-
+exports.getHistoryByUserId = (req, res, next) => {
+  const { user_id } = req.params
+  selectHistoriesByUserId(user_id)
+  .then((response) => {
+    
+    res.status(200).send(response)
+  })
+  .catch((err) => {
+    next(err)
+  })
+}
