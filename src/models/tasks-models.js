@@ -39,6 +39,9 @@ exports.selectTaskByTaskId = (task_id) => {
 }
 
 exports.createTaskByUserId = (user_id, {task_name, gem_value} ) => {
+  if (!task_name || !gem_value) {
+    return Promise.reject({status: 400, msg: "Missing input"})
+  }
   return db
   .query(`INSERT INTO tasks (user_id, task_name, gem_value, is_default)
     VALUES ($1, $2, $3, false)

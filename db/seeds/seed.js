@@ -45,6 +45,7 @@ const seed = ({
       return db.query(`
             CREATE TABLE routines (
             routine_id SERIAL PRIMARY KEY NOT NULL,
+            routine_name VARCHAR NOT NULL,
             user_id INT REFERENCES users(user_id) NOT NUll,
             task_1 INT REFERENCES tasks(task_id) NOT NULL,
             task_2 INT REFERENCES tasks(task_id) NOT NULL,
@@ -104,7 +105,7 @@ const seed = ({
         return formatRoutineTasks(routine);
       });
       const insertedRoutinesQueryStr = format(
-        `INSERT INTO routines (user_id, 
+        `INSERT INTO routines (routine_name, user_id, 
         task_1, 
         task_2, 
         task_3, 

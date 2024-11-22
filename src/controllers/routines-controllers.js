@@ -1,6 +1,7 @@
 const {
     selectRoutinesByUserId,
-    selectRoutineByRoutineId
+    selectRoutineByRoutineId,
+    createRoutineByUserId
   } = require("../models/routines-models");
 
   exports.getRoutinesByUserId = (req, res, next) => {
@@ -24,3 +25,15 @@ const {
         next(err);
       });
   };
+
+  exports.postRoutineByUserId = (req, res, next) => {
+    const { user_id } = req.params;
+    const newRoutine = req.body
+    createRoutineByUserId(user_id, newRoutine)
+    .then((routine)=>{
+      res.status(201).send({ routine })
+    })
+    .catch((err) => {
+      next(err)
+    })
+  }

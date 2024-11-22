@@ -41,7 +41,6 @@ exports.getTaskByTaskId = (req, res, next) => {
 exports.postTaskByUserId = (req, res, next) => {
   const { user_id } = req.params
   const newTask = req.body
-
   createTaskByUserId(user_id, newTask)
   .then((task)=>{
     res.status(201).send({ task })
