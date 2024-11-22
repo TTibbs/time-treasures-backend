@@ -30,6 +30,9 @@ exports.selectRoutineByRoutineId = (routine_id) => {
     };
 
 exports.createRoutineByUserId = (user_id, {routine_name, tasks, target_time}) => {
+    if (!routine_name || !tasks || !target_time) {
+      return Promise.reject({status: 400, msg: "Missing input"})
+    }
     const routineObj = {
         routineName: routine_name,
         userId: user_id,
