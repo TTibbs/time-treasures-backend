@@ -78,3 +78,16 @@ exports.createRoutineByUserId = (
     });
   // FormattedData to be refactored - need to learn how to destructure an array
 };
+
+exports.deleteRoutineById = (id) => {
+  return db.query(`SELECT * FROM routines WHERE routine_id = $1`, [id])
+  .then(({rows}) => {
+    if (rows.length === 0) {
+      return Promise.reject({status: 404, msg: "Routine Not Found"})
+    }
+    return db.query(`DELETE FROM routines WHERE routine_id = $1 RETURNING *`, [id])
+    .then(() => {
+      return {status: 204}
+    })
+  })
+}

@@ -1,4 +1,5 @@
-const { selectHistories } = require("../models/histories-models");
+const { response } = require("../app");
+const { selectHistories, insertHistory } = require("../models/histories-models");
 
 exports.getHistory = (req, res, next) => {
   selectHistories()
@@ -9,3 +10,5 @@ exports.getHistory = (req, res, next) => {
       next(err);
     });
 };
+
+
