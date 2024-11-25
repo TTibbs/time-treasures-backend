@@ -470,12 +470,13 @@ describe("Testing the API", () => {
       return request(app)
         .delete(`/api/tasks/1`)
         .expect(204)
-        .then(({body}) => {
-          expect(body).toEqual({})
-          return db.query("SELECT * FROM tasks WHERE task_id = 1;")
-          .then(({rows}) => {
-            expect(rows.length).toBe(0)
-          })
+        .then(({ body }) => {
+          expect(body).toEqual({});
+          return db
+            .query("SELECT * FROM tasks WHERE task_id = 1;")
+            .then(({ rows }) => {
+              expect(rows.length).toBe(0);
+            });
         });
     });
     test("DELETE: 404 /tasks/:task_id - returns 404 when task id not found", () => {
@@ -485,15 +486,15 @@ describe("Testing the API", () => {
         .then(({ body: { msg } }) => {
           expect(msg).toBe("Task Not Found");
         });
-    })
+    });
     test("DELETE: 400 /tasks/:task_id - returns 400 when passed an invalid task id", () => {
       return request(app)
         .delete(`/api/tasks/not-an-id`)
         .expect(400)
         .then(({ body: { msg } }) => {
-          expect(msg).toBe("Bad request")
+          expect(msg).toBe("Bad request");
         });
-    })
+    });
   });
 
   describe("Testing the routine endpoint", () => {
@@ -531,12 +532,13 @@ describe("Testing the API", () => {
       return request(app)
         .delete(`/api/routines/1`)
         .expect(204)
-        .then(({body}) => {
-          expect(body).toEqual({})
-          return db.query("SELECT * FROM routines WHERE routine_id = 1;")
-          .then(({rows}) => {
-            expect(rows.length).toBe(0)
-          })
+        .then(({ body }) => {
+          expect(body).toEqual({});
+          return db
+            .query("SELECT * FROM routines WHERE routine_id = 1;")
+            .then(({ rows }) => {
+              expect(rows.length).toBe(0);
+            });
         });
     });
     test("DELETE: 404 /routines/:routine_id - returns 404 when routine id not found", () => {
@@ -546,15 +548,15 @@ describe("Testing the API", () => {
         .then(({ body: { msg } }) => {
           expect(msg).toBe("Routine Not Found");
         });
-    })
+    });
     test("DELETE: 400 /routines/:routine_id - returns 400 when passed an invalid routine id", () => {
       return request(app)
         .delete(`/api/routines/not-an-id`)
         .expect(400)
         .then(({ body: { msg } }) => {
-          expect(msg).toBe("Bad request")
+          expect(msg).toBe("Bad request");
         });
-    })
+    });
   });
 
   describe("Testing the histories endpoint", () => {
@@ -578,7 +580,7 @@ describe("Testing the API", () => {
         .get(`/api/histories/1`)
         .expect(200)
         .then(({ body: { histories } }) => {
-          expect(histories.length).toBe(3)
+          expect(histories.length).toBe(3);
           histories.forEach((history) => {
             expect(history).toHaveProperty("history_id", expect.any(Number));
             expect(history).toHaveProperty("user_id", expect.any(Number));
@@ -594,22 +596,53 @@ describe("Testing the API", () => {
         .get(`/api/histories/not-an-id`)
         .expect(400)
         .then(({ body: { msg } }) => {
-          expect(msg).toBe("Bad request")
-          
-          });
+          expect(msg).toBe("Bad request");
         });
     });
-    test("GET: 404 /histories/:user_id - returns 404 not found when passed a non-existent ID", () => {
-      return request(app)
-        .get(`/api/histories/9999`)
-        .expect(404)
-        .then(({ body: { msg } }) => {
-          expect(msg).toBe("History Not Found")
-          
-        });
-     });    
   });
-
+  test("GET: 404 /histories/:user_id - returns 404 not found when passed a non-existent ID", () => {
+    return request(app)
+      .get(`/api/histories/9999`)
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("History Not Found");
+      });
+  });
+  test("GET: 200 /histories/routine/:routine_id - returns an array of histories for a specific routine", () => {
+    return request(app)
+      .get(`/api/histories/routine/1`)
+      .expect(200)
+      .then(({ body: { histories } }) => {
+        expect(histories.length).toBe(3);
+        histories.forEach((history) => {
+          expect(history.routine_id).toBe(1);
+          expect(history).toHaveProperty("history_id", expect.any(Number));
+          expect(history).toHaveProperty("user_id", expect.any(Number));
+          expect(history).toHaveProperty("timestamp", expect.any(String));
+          expect(history).toHaveProperty("total_time", expect.any(Number));
+          expect(new Date(history.timestamp).toISOString()).toBe(
+            history.timestamp
+          );
+        });
+      });
+  });
+  test("GET: 400 /histories/routine/:routine_id - returns 400 Bad Request when passed an invalid routine ID", () => {
+    return request(app)
+      .get(`/api/histories/routine/not-an-id`)
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad request");
+      });
+  });
+  test("GET: 404 /histories/routine/:routine_id - returns 404 when routine ID not found", () => {
+    return request(app)
+      .get(`/api/histories/routine/9999`)
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("History Not Found");
+      });
+  });
+});
 
 describe("Testing the endpoint errors", () => {
   test("Should return an error when the endpoint is invalid", () => {

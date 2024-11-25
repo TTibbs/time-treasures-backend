@@ -1,9 +1,13 @@
 module.exports = [
+  // default tasks
+  { taskName: "Prepare Breakfast", gemValue: 2, isDefault: true },
+  { taskName: "Meditate", gemValue: 2, isDefault: true },
+  { taskName: "Write Code", gemValue: 2, isDefault: true },
+
   // User 1
   { userId: 1, taskName: "Brush Teeth", gemValue: 1, isDefault: false },
   { userId: 1, taskName: "Make Bed", gemValue: 2, isDefault: false },
   { userId: 1, taskName: "Read a Book", gemValue: 3, isDefault: false },
-  { userId: 1, taskName: "Write Code", gemValue: 2, isDefault: true },
   { userId: 1, taskName: "Test App", gemValue: 3, isDefault: false },
   { userId: 1, taskName: "Plan Trip", gemValue: 3, isDefault: false },
 
@@ -16,7 +20,6 @@ module.exports = [
   { userId: 2, taskName: "Learn Language", gemValue: 3, isDefault: false },
 
   // User 3
-  { userId: 3, taskName: "Meditate", gemValue: 2, isDefault: true },
   { userId: 3, taskName: "Clean Desk", gemValue: 1, isDefault: false },
   { userId: 3, taskName: "Write Journal", gemValue: 3, isDefault: false },
   { userId: 3, taskName: "Organize Files", gemValue: 3, isDefault: false },
@@ -32,7 +35,6 @@ module.exports = [
   { userId: 4, taskName: "Watch Movie", gemValue: 1, isDefault: false },
 
   // User 5
-  { userId: 5, taskName: "Prepare Breakfast", gemValue: 2, isDefault: true },
   { userId: 5, taskName: "Feed Pet", gemValue: 1, isDefault: false },
   { userId: 5, taskName: "Walk Dog", gemValue: 3, isDefault: false },
   { userId: 5, taskName: "Study", gemValue: 3, isDefault: false },
