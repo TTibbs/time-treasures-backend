@@ -470,12 +470,13 @@ describe("Testing the API", () => {
       return request(app)
         .delete(`/api/tasks/1`)
         .expect(204)
-        .then(({body}) => {
-          expect(body).toEqual({})
-          return db.query("SELECT * FROM tasks WHERE task_id = 1;")
-          .then(({rows}) => {
-            expect(rows.length).toBe(0)
-          })
+        .then(({ body }) => {
+          expect(body).toEqual({});
+          return db
+            .query("SELECT * FROM tasks WHERE task_id = 1;")
+            .then(({ rows }) => {
+              expect(rows.length).toBe(0);
+            });
         });
     });
     test("DELETE: 404 /tasks/:task_id - returns 404 when task id not found", () => {
@@ -485,15 +486,15 @@ describe("Testing the API", () => {
         .then(({ body: { msg } }) => {
           expect(msg).toBe("Task Not Found");
         });
-    })
+    });
     test("DELETE: 400 /tasks/:task_id - returns 400 when passed an invalid task id", () => {
       return request(app)
         .delete(`/api/tasks/not-an-id`)
         .expect(400)
         .then(({ body: { msg } }) => {
-          expect(msg).toBe("Bad request")
+          expect(msg).toBe("Bad request");
         });
-    })
+    });
   });
 
   describe("Testing the routine endpoint", () => {
@@ -528,71 +529,101 @@ describe("Testing the API", () => {
     });
 
     test("PATCH: 200 /routines/:routine_id - updates routine tasks and returns 200 status code", () => {
-      const newTasks = {tasks: [1,3,7,9]}
+      const newTasks = { tasks: [1, 3, 7, 9] };
       return request(app)
-      .patch("/api/routines/1")
-      .send(newTasks)
-      .expect(200)
-      .then(({body}) => {
-        const updatedRoutine = body[0]
-        expect(body.length).toBe(1)
-        expect(updatedRoutine.task_1).toBe(1)
-        expect(updatedRoutine.task_2).toBe(3)
-        expect(updatedRoutine.task_3).toBe(7)
-        expect(updatedRoutine.task_4).toBe(9)
-      })
-    })
+        .patch("/api/routines/1")
+        .send(newTasks)
+        .expect(200)
+        .then(({ body }) => {
+          const updatedRoutine = body[0];
+          expect(body.length).toBe(1);
+          expect(updatedRoutine.task_1).toBe(1);
+          expect(updatedRoutine.task_2).toBe(3);
+          expect(updatedRoutine.task_3).toBe(7);
+          expect(updatedRoutine.task_4).toBe(9);
+        });
+    });
     test("PATCH: 200 /routines/:routine_id - updates routine_name and target_time returning a 200 status code", () => {
-      const newUpdates = {routine_name: "Weekday Morning Tasks", target_time: 250000}
+      const newUpdates = {
+        routine_name: "Weekday Morning Tasks",
+        target_time: 250000,
+      };
       return request(app)
-      .patch("/api/routines/1")
-      .send(newUpdates)
-      .expect(200)
-      .then(({body}) => {
-        const updatedRoutine = body[0]
-        expect(body.length).toBe(1)
-        expect(updatedRoutine.routine_name).toBe("Weekday Morning Tasks")
-        expect(updatedRoutine.target_time).toBe(250000)
-      })
-    })
-    test.only("PATCH: 400 /routines/:routine_id - returns 400 Bad Request when passed an invalid id", () => {
-      const newUpdates = {routine_name: "Weekday Morning Tasks", target_time: 250000}
+        .patch("/api/routines/1")
+        .send(newUpdates)
+        .expect(200)
+        .then(({ body }) => {
+          const updatedRoutine = body[0];
+          expect(body.length).toBe(1);
+          expect(updatedRoutine.routine_name).toBe("Weekday Morning Tasks");
+          expect(updatedRoutine.target_time).toBe(250000);
+        });
+    });
+    test("PATCH: 200 /routines/:routine_id - updates routine_name and target_time returning a 200 status code even with irrelevant keys", () => {
+      const newUpdates = {
+        routine_name: "Weekday Morning Tasks",
+        target_time: 250000,
+        irrelevant: "not important"
+      };
       return request(app)
-      .patch("/api/routines/not-an-id")
-      .expect(400)
-      .then(({body: {msg}}) => {
-        console.log(msg)
-      })
-    })
-    test.only("PATCH: 404 /routines/:routine_id - returns 400 Bad Request when passed a non-existent id", () => {
-      const newUpdates = {routine_name: "Weekday Morning Tasks", target_time: 250000}
+        .patch("/api/routines/1")
+        .send(newUpdates)
+        .expect(200)
+        .then(({ body }) => {
+          const updatedRoutine = body[0];
+          expect(body.length).toBe(1);
+          expect(updatedRoutine.routine_name).toBe("Weekday Morning Tasks");
+          expect(updatedRoutine.target_time).toBe(250000);
+        });
+    });
+    test("PATCH: 400 /routines/:routine_id - returns 400 Bad Request when passed an invalid id", () => {
+      const newUpdates = {
+        routine_name: "Weekday Morning Tasks",
+        target_time: 250000,
+      };
       return request(app)
-      .patch("/api/routines/9999")
-      .expect(404)
-      .then(({body: {msg}}) => {
-        console.log(msg)
-      })
-    })
-    test.only("PATCH: 400 /routines/:routine_id - returns 400 Bad Request when passed a patch request with irrelevant keys", () => {
-      const newUpdates = {routine_name: "Weekday Morning Tasks", target_time: 250000}
+        .patch("/api/routines/not-an-id")
+        .send(newUpdates)
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Bad request")
+        });
+    });
+    test("PATCH: 404 /routines/:routine_id - returns 400 Bad Request when passed a non-existent id", () => {
+      const newUpdates = {
+        routine_name: "Weekday Morning Tasks",
+        target_time: 250000,
+      };
       return request(app)
-      .patch("/api/routines/not-an-id")
-      .expect(400)
-      .then(({body: {msg}}) => {
-        console.log(msg)
-      })
-    })
+        .patch("/api/routines/9999")
+        .send(newUpdates)
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Routine Not Found")
+        });
+    });
+    test("PATCH: 400 /routines/:routine_id - returns 400 Bad Request when passed a patch with no correct keys", () => {
+      const newUpdates = { nothing: "not helpful", irrelevant: 250000 };
+      return request(app)
+        .patch("/api/routines/1")
+        .send(newUpdates)
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Bad Request")
+        });
+    });
 
     test("DELETE: 204 /routines/:routine_id - returns 204 and no content when task successfully deleted", () => {
       return request(app)
         .delete(`/api/routines/1`)
         .expect(204)
-        .then(({body}) => {
-          expect(body).toEqual({})
-          return db.query("SELECT * FROM routines WHERE routine_id = 1;")
-          .then(({rows}) => {
-            expect(rows.length).toBe(0)
-          })
+        .then(({ body }) => {
+          expect(body).toEqual({});
+          return db
+            .query("SELECT * FROM routines WHERE routine_id = 1;")
+            .then(({ rows }) => {
+              expect(rows.length).toBe(0);
+            });
         });
     });
     test("DELETE: 404 /routines/:routine_id - returns 404 when routine id not found", () => {
@@ -602,15 +633,15 @@ describe("Testing the API", () => {
         .then(({ body: { msg } }) => {
           expect(msg).toBe("Routine Not Found");
         });
-    })
+    });
     test("DELETE: 400 /routines/:routine_id - returns 400 when passed an invalid routine id", () => {
       return request(app)
         .delete(`/api/routines/not-an-id`)
         .expect(400)
         .then(({ body: { msg } }) => {
-          expect(msg).toBe("Bad request")
+          expect(msg).toBe("Bad request");
         });
-    })
+    });
   });
 
   describe("Testing the histories endpoint", () => {
@@ -634,7 +665,7 @@ describe("Testing the API", () => {
         .get(`/api/histories/1`)
         .expect(200)
         .then(({ body: { histories } }) => {
-          expect(histories.length).toBe(3)
+          expect(histories.length).toBe(3);
           histories.forEach((history) => {
             expect(history).toHaveProperty("history_id", expect.any(Number));
             expect(history).toHaveProperty("user_id", expect.any(Number));
@@ -650,22 +681,19 @@ describe("Testing the API", () => {
         .get(`/api/histories/not-an-id`)
         .expect(400)
         .then(({ body: { msg } }) => {
-          expect(msg).toBe("Bad request")
-          
-          });
+          expect(msg).toBe("Bad request");
         });
     });
-    test("GET: 404 /histories/:user_id - returns 404 not found when passed a non-existent ID", () => {
-      return request(app)
-        .get(`/api/histories/9999`)
-        .expect(404)
-        .then(({ body: { msg } }) => {
-          expect(msg).toBe("History Not Found")
-          
-        });
-     });    
   });
-
+  test("GET: 404 /histories/:user_id - returns 404 not found when passed a non-existent ID", () => {
+    return request(app)
+      .get(`/api/histories/9999`)
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("History Not Found");
+      });
+  });
+});
 
 describe("Testing the endpoint errors", () => {
   test("Should return an error when the endpoint is invalid", () => {
