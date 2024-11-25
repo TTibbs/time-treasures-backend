@@ -36,7 +36,7 @@ exports.patchUserById = (req, res, next) => {
   Promise.all(promises)
     .then((result) => {
       const patchedUser = result[1];
-      res.status(202).send({ patchedUser });
+      res.status(200).send({ patchedUser });
     })
     .catch((err) => {
       next(err);

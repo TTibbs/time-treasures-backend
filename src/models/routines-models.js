@@ -1,5 +1,6 @@
 const db = require("../../db/connection.js");
 const { formatRoutineTasks } = require("../../db/seeds/utils.js");
+const { response } = require("../app.js");
 
 exports.selectRoutinesByUserId = (user_id) => {
   return db
@@ -89,5 +90,28 @@ exports.deleteRoutineById = (id) => {
     .then(() => {
       return {status: 204}
     })
+  })
+}
+
+exports.updateRoutine = (id, tasks, routine_name, target_time) => {
+  console.log({id, tasks, routine_name, target_time})
+  const updateQuery = []
+  if (tasks) {
+    tasks.forEach((task, index) => {
+      updateQuery.push(`task_${index + 1} = ${task}`)
+    })
+  }
+  if (target_time) updateQuery.push(`target_time = ${target_time}`)
+  
+
+  return db.query(`UPDATE routines SET ${updateQuery.join(", ")} WHERE routine_id = ${id} RETURNING *`)
+  .then(({rows}) => {
+    if (routine_name) {
+      return db.query("UPDATE routines SET routine_name = $1 WHERE routine_id = $2 RETURNING *", [routine_name, id])
+      .then(({rows}) => {
+        return rows
+      })
+    }
+    return rows
   })
 }

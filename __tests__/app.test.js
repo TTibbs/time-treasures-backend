@@ -344,26 +344,26 @@ describe("Testing the API", () => {
           expect(msg).toBe("Missing input");
         });
     });
-    test("PATCH: 202 /users/:user_id - updates the routine and returns a body to the client", () => {
+    test("PATCH: 200 /users/:user_id - updates the routine and returns a body to the client", () => {
       const updatedUser = {
         username: "Bob",
       };
       return request(app)
         .patch(`/api/users/1`)
         .send(updatedUser)
-        .expect(202)
+        .expect(200)
         .then(({ body: { patchedUser } }) => {
           expect(patchedUser.username).toBe("Bob");
         });
     });
-    test("PATCH: 202 /users/:user_id - updates the routine and returns correct body with gems updated", () => {
+    test("PATCH: 200 /users/:user_id - updates the routine and returns correct body with gems updated", () => {
       const updatedUser = {
         total_gems: 201,
       };
       return request(app)
         .patch(`/api/users/1`)
         .send(updatedUser)
-        .expect(202)
+        .expect(200)
         .then(({ body: { patchedUser } }) => {
           expect(patchedUser.total_gems).toBe(201);
         });
@@ -526,6 +526,62 @@ describe("Testing the API", () => {
           expect(msg).toBe("Bad request");
         });
     });
+
+    test("PATCH: 200 /routines/:routine_id - updates routine tasks and returns 200 status code", () => {
+      const newTasks = {tasks: [1,3,7,9]}
+      return request(app)
+      .patch("/api/routines/1")
+      .send(newTasks)
+      .expect(200)
+      .then(({body}) => {
+        const updatedRoutine = body[0]
+        expect(body.length).toBe(1)
+        expect(updatedRoutine.task_1).toBe(1)
+        expect(updatedRoutine.task_2).toBe(3)
+        expect(updatedRoutine.task_3).toBe(7)
+        expect(updatedRoutine.task_4).toBe(9)
+      })
+    })
+    test("PATCH: 200 /routines/:routine_id - updates routine_name and target_time returning a 200 status code", () => {
+      const newUpdates = {routine_name: "Weekday Morning Tasks", target_time: 250000}
+      return request(app)
+      .patch("/api/routines/1")
+      .send(newUpdates)
+      .expect(200)
+      .then(({body}) => {
+        const updatedRoutine = body[0]
+        expect(body.length).toBe(1)
+        expect(updatedRoutine.routine_name).toBe("Weekday Morning Tasks")
+        expect(updatedRoutine.target_time).toBe(250000)
+      })
+    })
+    test.only("PATCH: 400 /routines/:routine_id - returns 400 Bad Request when passed an invalid id", () => {
+      const newUpdates = {routine_name: "Weekday Morning Tasks", target_time: 250000}
+      return request(app)
+      .patch("/api/routines/not-an-id")
+      .expect(400)
+      .then(({body: {msg}}) => {
+        console.log(msg)
+      })
+    })
+    test.only("PATCH: 404 /routines/:routine_id - returns 400 Bad Request when passed a non-existent id", () => {
+      const newUpdates = {routine_name: "Weekday Morning Tasks", target_time: 250000}
+      return request(app)
+      .patch("/api/routines/9999")
+      .expect(404)
+      .then(({body: {msg}}) => {
+        console.log(msg)
+      })
+    })
+    test.only("PATCH: 400 /routines/:routine_id - returns 400 Bad Request when passed a patch request with irrelevant keys", () => {
+      const newUpdates = {routine_name: "Weekday Morning Tasks", target_time: 250000}
+      return request(app)
+      .patch("/api/routines/not-an-id")
+      .expect(400)
+      .then(({body: {msg}}) => {
+        console.log(msg)
+      })
+    })
 
     test("DELETE: 204 /routines/:routine_id - returns 204 and no content when task successfully deleted", () => {
       return request(app)
