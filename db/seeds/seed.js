@@ -86,6 +86,7 @@ const seed = ({
           image_url,
         ])
       );
+      
       return db.query(insertedUsersQueryStr);
     })
     .then(() => {
@@ -98,6 +99,7 @@ const seed = ({
           isDefault,
         ])
       );
+      
       return db.query(insertedTasksQueryStr);
     })
     .then(() => {
@@ -124,6 +126,7 @@ const seed = ({
         target_time) VALUES %L`,
         formattedData
       );
+      
       return db.query(insertedRoutinesQueryStr);
     })
     .then(() => {
@@ -136,6 +139,7 @@ const seed = ({
           time,
         ])
       );
+      
       return db.query(insertedHistoriesQueryStr);
     });
 };
