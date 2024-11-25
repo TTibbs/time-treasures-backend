@@ -1,4 +1,9 @@
 module.exports = [
+  // default tasks
+  { taskName: "Prepare Breakfast", gemValue: 2, isDefault: true },
+  { taskName: "Meditate", gemValue: 2, isDefault: true },
+  { taskName: "Write Code", gemValue: 2, isDefault: true },
+
   // User 1
   { userId: 1, taskName: "Brush Teeth", gemValue: 1, isDefault: false },
   { userId: 1, taskName: "Make Bed", gemValue: 2, isDefault: false },
