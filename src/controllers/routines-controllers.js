@@ -54,12 +54,13 @@ exports.deleteRoutine = (req, res, next) => {
 exports.patchRoutine = (req, res, next) => {
   const { routine_id } = req.params
   const { tasks, routine_name, target_time } = req.body
+  
+  
   updateRoutine(routine_id, tasks, routine_name, target_time)
   .then((response) => {
     res.status(200).send(response)
   })
   .catch((err) => {
-    console.log(err)
     next(err)
   })
 }
