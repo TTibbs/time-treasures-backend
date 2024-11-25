@@ -1,0 +1,31 @@
+userId,taskName,gemValue,isDefault
+1,Brush Teeth,1,false
+1,Make Bed,2,false
+1,Read a Book,3,false
+1,Write Code,2,true
+1,Test App,3,false
+1,Plan Trip,3,false
+2,Drink Water,1,false
+2,Morning Exercise,2,false
+2,Plan Day,3,false
+2,Take a Break,1,false
+2,Call Friend,2,false
+2,Learn Language,3,false
+3,Meditate,2,true
+3,Clean Desk,1,false
+3,Write Journal,3,false
+3,Organize Files,3,false
+3,Practice Music,1,false
+3,Paint,2,false
+4,Water Plants,1,false
+4,Sort Emails,2,false
+4,Review Goals,3,false
+4,Cook Dinner,2,false
+4,Fix Bug,2,false
+4,Watch Movie,1,false
+5,Prepare Breakfast,2,true
+5,Feed Pet,1,false
+5,Walk Dog,3,false
+5,Study,3,false
+5,Exercise,1,false
+5,Go Shopping,2,false
