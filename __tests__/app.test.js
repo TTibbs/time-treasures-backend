@@ -572,9 +572,44 @@ describe("Testing the API", () => {
           });
         });
     });
-    
+
+    test("GET: 200 /histories/:user_id - returns an array of histories by user_id", () => {
+      return request(app)
+        .get(`/api/histories/1`)
+        .expect(200)
+        .then(({ body: { histories } }) => {
+          expect(histories.length).toBe(3)
+          histories.forEach((history) => {
+            expect(history).toHaveProperty("history_id", expect.any(Number));
+            expect(history).toHaveProperty("user_id", expect.any(Number));
+            expect(history).toHaveProperty("routine_id", expect.any(Number));
+            expect(history).toHaveProperty("timestamp", expect.any(String));
+            expect(history).toHaveProperty("total_time", expect.any(Number));
+          });
+        });
+    });
+
+    test("GET: 400 /histories/:user_id - returns 400 Bad Request when passed an invalid ID", () => {
+      return request(app)
+        .get(`/api/histories/not-an-id`)
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Bad request")
+          
+          });
+        });
+    });
+    test("GET: 404 /histories/:user_id - returns 404 not found when passed a non-existent ID", () => {
+      return request(app)
+        .get(`/api/histories/9999`)
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("History Not Found")
+          
+        });
+     });    
   });
-});
+
 
 describe("Testing the endpoint errors", () => {
   test("Should return an error when the endpoint is invalid", () => {
