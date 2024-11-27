@@ -1,6 +1,6 @@
 const db = require("../../db/connection.js");
 const { formatRoutineTasks } = require("../../db/seeds/utils.js");
-const { response } = require("../app.js");
+const { selectTaskByTaskId } = require("./tasks-models.js");
 
 exports.selectRoutinesByUserId = (user_id) => {
   return db
@@ -121,5 +121,22 @@ exports.updateRoutine = (id, tasks, routine_name, target_time) => {
         }
         return rows
       })
+  })
+}
+
+exports.selectTasksByRoutine = (id) => {
+  return this.selectRoutineByRoutineId(id)
+  .then((routine) => {
+    const tasksArr = []
+    for (const key in routine) {
+      if (key.includes("task") && routine[key]) {
+        tasksArr.push(`task_id = ${routine[key]}`)
+      }
+    }
+
+    return db.query(`SELECT * FROM tasks WHERE ${tasksArr.join(" OR ")};`)
+    .then(({rows}) => {
+      return rows
+    })
   })
 }

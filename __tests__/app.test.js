@@ -642,6 +642,15 @@ describe("Testing the API", () => {
           expect(msg).toBe("Bad request");
         });
     });
+
+    test("GET: 200 /routine/:id/tasks - returns array of tasks in that routine", () => {
+      return request(app)
+      .get("/api/routines/2/tasks")
+      .expect(200)
+      .then(({body: {tasks}}) => {
+        expect(tasks.length).toBe(4)
+      })
+    })
   });
 
   describe("Testing the histories endpoint", () => {

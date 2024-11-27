@@ -3,7 +3,8 @@ const {
   selectRoutineByRoutineId,
   createRoutineByUserId,
   deleteRoutineById,
-  updateRoutine
+  updateRoutine,
+  selectTasksByRoutine
 } = require("../models/routines-models");
 
 exports.getRoutinesByUserId = (req, res, next) => {
@@ -62,5 +63,16 @@ exports.patchRoutine = (req, res, next) => {
   })
   .catch((err) => {
     next(err)
+  })
+}
+
+exports.getTasksByRoutine = (req, res, next) => {
+  const { routine_id } = req.params
+  selectTasksByRoutine(routine_id)
+  .then((response) => {
+    res.status(200).send({tasks: response})
+  })
+  .catch((err) => {
+    console.log(err)
   })
 }
